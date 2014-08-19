@@ -37,4 +37,17 @@ public class ZipTest {
                 ZippedPair.of("C is for ", "Carrot")));
     }
 
+    @Test public void
+    zips_a_stream_with_index() {
+        Stream<String> source = Stream.of("Foo", "Bar", "Baz");
+
+        List<ZippedPair<Integer, String>> zipped = StreamUtils.zipWithIndex(source).collect(Collectors.toList());
+
+        assertThat(zipped, hasSize(3));
+        assertThat(zipped, hasItems(
+                ZippedPair.of(0, "Foo"),
+                ZippedPair.of(1, "Bar"),
+                ZippedPair.of(2, "Baz")));
+    }
+
 }

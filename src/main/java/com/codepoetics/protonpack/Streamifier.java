@@ -33,30 +33,20 @@ public interface Streamifier {
         return new SizednessCapture() {
             @Override
             public CharacteristicsCapture unsized() {
-                return new CharacteristicsCapture() {
+                return characteristics -> new Streamifier() {
                     @Override
-                    public Streamifier withCharacteristics(int characteristics) {
-                        return new Streamifier() {
-                            @Override
-                            public <T> Stream<T> streamify(Iterator<T> iterator) {
-                                return stream(Spliterators.spliteratorUnknownSize(iterator, characteristics), isParallel);
-                            }
-                        };
+                    public <T> Stream<T> streamify(Iterator<T> iterator) {
+                        return stream(Spliterators.spliteratorUnknownSize(iterator, characteristics), isParallel);
                     }
                 };
             }
 
             @Override
             public CharacteristicsCapture sized(long size) {
-                return new CharacteristicsCapture() {
+                return characteristics -> new Streamifier() {
                     @Override
-                    public Streamifier withCharacteristics(int characteristics) {
-                        return new Streamifier() {
-                            @Override
-                            public <T> Stream<T> streamify(Iterator<T> iterator) {
-                                return stream(Spliterators.spliterator(iterator, size, characteristics), isParallel);
-                            }
-                        };
+                    public <T> Stream<T> streamify(Iterator<T> iterator) {
+                        return stream(Spliterators.spliterator(iterator, size, characteristics & Spliterator.SIZED), isParallel);
                     }
                 };
             }

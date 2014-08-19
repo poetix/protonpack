@@ -17,6 +17,14 @@ public final class StreamUtils {
 
     }
 
+    public static Stream<Integer> indices() {
+        return Stream.iterate(0, l -> l + 1);
+    }
+
+    public static <T> Stream<ZippedPair<Integer, T>> zipWithIndex(Stream<T> source) {
+        return zip(indices(), source);
+    }
+
     public static <L, R> Stream<ZippedPair<L, R>> zip(Stream<L> lefts, Stream<R> rights) {
         return zip(lefts, rights, ZippedPair::of);
     }

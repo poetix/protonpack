@@ -47,7 +47,14 @@ public class UnfoldTest {
     }
 
     @Test public void
-    returns_an_empty_stream_if_seed_is_null() {
+    unfold_with_generator_returns_an_empty_stream_if_seed_is_null() {
+        Stream<Integer> unfolded = StreamUtils.unfold(null, (Integer i) -> Optional.of(i + 1));
+
+        assertThat(unfolded.collect(Collectors.toList()), empty());
+    }
+
+    @Test public void
+    unfold_with_condition_returns_an_empty_stream_if_seed_is_null() {
         Stream<Integer> unfolded = StreamUtils.unfold(null, i -> i + 1, i -> i <= 10);
 
         assertThat(unfolded.collect(Collectors.toList()), empty());
