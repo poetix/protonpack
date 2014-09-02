@@ -5,7 +5,7 @@ A small collection of ```Stream``` utilities for Java 8. Protonpack provides the
 
 * ```takeWhile``` and ```takeUntil```
 * ```skipWhile``` and ```skipUntil```
-* ```zipWith``` and ```zipWithIndex```
+* ```zip``` and ```zipWithIndex```
 * ```unfold```
 
 ## takeWhile
@@ -34,7 +34,7 @@ assertThat(collected,
            contains(4, 5, 6, 7, 8, 9, 10));
 ```
 
-## zipWith
+## zip
 
 Combines two streams using the supplied combiner function.
 
