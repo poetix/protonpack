@@ -1,6 +1,7 @@
 package com.codepoetics.protonpack.iterators;
 
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 import java.util.function.Predicate;
 
 public class SkipWhileIterator<T> implements Iterator<T> {
@@ -22,7 +23,7 @@ public class SkipWhileIterator<T> implements Iterator<T> {
 
     private boolean seekFirst() {
         while(source.hasNext()) {
-            if (!predicate.test(source.peek())) {
+            if (!source.peek().map(predicate::test).orElse(false)) {
                 return true;
             }
             source.next();
@@ -41,7 +42,7 @@ public class SkipWhileIterator<T> implements Iterator<T> {
     @Override
     public T next() {
         if (!hasNext()) {
-            return null;
+            throw new NoSuchElementException();
         }
         return source.next();
     }

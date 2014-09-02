@@ -1,40 +1,41 @@
 package com.codepoetics.protonpack.iterators;
 
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 import java.util.Optional;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
 
 public interface PeekableIterator<T> extends Iterator<T> {
 
     public static <T> PeekableIterator<T> peeking(Iterator<T> source) {
         return new PeekableIterator<T>() {
 
-            private T buffer = null;
+            private Optional<T> buffer = Optional.empty();
 
             @Override
-            public T peek() {
-                if (buffer == null && source.hasNext()) {
-                    buffer = source.next();
+            public Optional<T> peek() {
+                if (!buffer.isPresent() && source.hasNext()) {
+                    buffer = Optional.of(source.next());
                 }
                 return buffer;
             }
 
             @Override
             public boolean hasNext() {
-                return peek() != null;
+                return peek().isPresent();
             }
 
             @Override
             public T next() {
-                T next = buffer == null ? source.next() : buffer;
-                buffer = null;
+                if (!hasNext()) {
+                    throw new NoSuchElementException();
+                }
+                T next = buffer.get();
+                buffer = Optional.empty();
                 return next;
             }
         };
     }
 
-    T peek();
+    Optional<T> peek();
 
 }

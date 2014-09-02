@@ -21,12 +21,8 @@ public final class StreamUtils {
         return Stream.iterate(0, l -> l + 1);
     }
 
-    public static <T> Stream<ZippedPair<Integer, T>> zipWithIndex(Stream<T> source) {
-        return zip(indices(), source);
-    }
-
-    public static <L, R> Stream<ZippedPair<L, R>> zip(Stream<L> lefts, Stream<R> rights) {
-        return zip(lefts, rights, ZippedPair::of);
+    public static <T> Stream<Indexed<T>> zipWithIndex(Stream<T> source) {
+        return zip(indices(), source, Indexed::index);
     }
 
     public static <L, R, O> Stream<O> zip(Stream<L> lefts, Stream<R> rights, BiFunction<L, R, O> combiner) {
@@ -40,17 +36,21 @@ public final class StreamUtils {
 
         boolean isParallel = lefts.isParallel() || rights.isParallel();
 
-        Streamifier streamifier = ((sharedCharacteristics & Spliterator.SIZED) != 0
-                ? Streamifier.streamifier(isParallel)
-                .sized(Math.min(leftSpliterator.getExactSizeIfKnown(),
-                        rightSpliterator.getExactSizeIfKnown()))
+        Streamifier streamifier = (isSized(sharedCharacteristics)
+                ? Streamifier.streamifier(isParallel).sized(
+                    Math.min(leftSpliterator.getExactSizeIfKnown(),
+                             rightSpliterator.getExactSizeIfKnown()))
                 : Streamifier.streamifier(isParallel).unsized())
-                .withCharacteristics(sharedCharacteristics);
+            .withCharacteristics(sharedCharacteristics);
 
         return streamifier.<O>streamify(ZippingIterator.over(
                 Spliterators.iterator(leftSpliterator),
                 Spliterators.iterator(rightSpliterator),
                 combiner));
+    }
+
+    private static boolean isSized(int characteristics) {
+        return (characteristics & Spliterator.SIZED) != 0;
     }
 
     public static <T> Stream<T> takeWhile(Stream<T> source, Predicate<T> condition) {
@@ -85,25 +85,7 @@ public final class StreamUtils {
         return skipWhile(source, condition.negate());
     }
 
-    public static <T> Stream<T> unfold(Supplier<T> supplier, Predicate<T> condition) {
-        T seed = supplier.get();
-        if (seed == null || !condition.test(seed)) {
-            return Stream.empty();
-        }
-        return Streamifier.toStream(UnfoldIterator.over(seed, Generator.withCondition(supplier, condition)));
-    }
-
-    public static <T> Stream<T> unfold(T seed, UnaryOperator<T> operator, Predicate<T> condition) {
-        if (seed == null || !condition.test(seed)) {
-            return Stream.empty();
-        }
-        return Streamifier.toStream(UnfoldIterator.over(seed, Generator.withCondition(operator, condition)));
-    }
-
     public static <T> Stream<T> unfold(T seed, Function<T, Optional<T>> generator) {
-        if (seed == null) {
-            return Stream.empty();
-        }
         return Streamifier.toStream(UnfoldIterator.over(seed, generator));
     }
 }

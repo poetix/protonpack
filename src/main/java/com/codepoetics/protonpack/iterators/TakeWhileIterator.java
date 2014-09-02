@@ -1,6 +1,7 @@
 package com.codepoetics.protonpack.iterators;
 
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 import java.util.function.Predicate;
 
 public class TakeWhileIterator<T> implements Iterator<T> {
@@ -21,13 +22,14 @@ public class TakeWhileIterator<T> implements Iterator<T> {
 
     @Override
     public boolean hasNext() {
-        T peeked = source.peek();
-        return peeked != null && predicate.test(peeked);
+        return source.peek().map(predicate::test).orElse(false);
     }
 
     @Override
     public T next() {
-        T next = source.next();
-        return predicate.test(next) ? next : null;
+        if (!hasNext()) {
+            throw new NoSuchElementException();
+        }
+        return source.next();
     }
 }
