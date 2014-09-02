@@ -41,7 +41,7 @@ public final class StreamUtils {
 
     /**
      * Zip together the "left" and "right" streams until either runs out of values.
-     * Each pair of values is combined into a single value using the supplied combiner function
+     * Each pair of values is combined into a single value using the supplied combiner function.
      * @param lefts The "left" stream to zip.
      * @param rights The "right" stream to zip.
      * @param combiner The function to combine "left" and "right" values.

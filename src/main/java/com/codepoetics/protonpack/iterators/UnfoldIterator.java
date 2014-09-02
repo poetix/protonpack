@@ -23,7 +23,7 @@ public class UnfoldIterator<T> implements Iterator<T> {
      * @return The constructed iterator.
      */
     public static <T> Iterator<T> over(T seed, Function<T, Optional<T>> generator) {
-        return new UnfoldIterator<T>(seed, generator);
+        return new UnfoldIterator<>(seed, generator);
     }
 
     private UnfoldIterator(T seed, Function<T, Optional<T>> generator) {
