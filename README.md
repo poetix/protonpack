@@ -1,6 +1,8 @@
 protonpack
 ==========
 
+[![Build Status](https://travis-ci.org/poetix/protonpack.svg?branch=master)](https://travis-ci.org/poetix/protonpack)
+
 A small collection of ```Stream``` utilities for Java 8. Protonpack provides the following:
 
 * ```takeWhile``` and ```takeUntil```
