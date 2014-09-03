@@ -12,7 +12,27 @@ import static org.hamcrest.Matchers.contains;
 public class ZipTest {
 
     @Test public void
-    zips_a_pair_of_streams_with_custom_combiner() {
+    zips_a_pair_of_streams_of_same_length() {
+        Stream<String> streamA = Stream.of("A", "B", "C");
+        Stream<String> streamB  = Stream.of("Apple", "Banana", "Carrot");
+
+        List<String> zipped = StreamUtils.zip(streamA, streamB, (a, b) -> a + " is for " + b).collect(Collectors.toList());
+
+        assertThat(zipped, contains("A is for Apple", "B is for Banana", "C is for Carrot"));
+    }
+
+    @Test public void
+    zips_a_pair_of_streams_where_first_stream_is_longer() {
+        Stream<String> streamA = Stream.of("A", "B", "C", "D");
+        Stream<String> streamB  = Stream.of("Apple", "Banana", "Carrot");
+
+        List<String> zipped = StreamUtils.zip(streamA, streamB, (a, b) -> a + " is for " + b).collect(Collectors.toList());
+
+        assertThat(zipped, contains("A is for Apple", "B is for Banana", "C is for Carrot"));
+    }
+
+    @Test public void
+    zips_a_pair_of_streams_where_second_stream_is_longer() {
         Stream<String> streamA = Stream.of("A", "B", "C");
         Stream<String> streamB  = Stream.of("Apple", "Banana", "Carrot", "Doughnut");
 

@@ -25,7 +25,7 @@ class SkipUntilSpliterator<T> implements Spliterator<T> {
             return source.tryAdvance(action);
         }
         while (!conditionMet && source.tryAdvance(e -> {
-            if (conditionMet = conditionMet || condition.test(e)) {
+            if (conditionMet = condition.test(e)) {
                 action.accept(e);
             }
         }));

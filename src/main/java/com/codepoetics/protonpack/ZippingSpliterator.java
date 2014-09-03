@@ -13,7 +13,7 @@ class ZippingSpliterator<L, R, O> implements Spliterator<O> {
     private final Spliterator<L> lefts;
     private final Spliterator<R> rights;
     private final BiFunction<L, R, O> combiner;
-    private boolean rightHadNext = true;
+    private boolean rightHadNext = false;
 
     private ZippingSpliterator(Spliterator<L> lefts, Spliterator<R> rights, BiFunction<L, R, O> combiner) {
         this.lefts = lefts;
@@ -23,9 +23,6 @@ class ZippingSpliterator<L, R, O> implements Spliterator<O> {
 
     @Override
     public boolean tryAdvance(Consumer<? super O> action) {
-        if (!rightHadNext) {
-            return false;
-        }
         rightHadNext = false;
         boolean leftHadNext = lefts.tryAdvance(l ->
             rights.tryAdvance(r -> {
