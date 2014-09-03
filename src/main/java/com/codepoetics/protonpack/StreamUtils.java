@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.function.*;
+import java.util.stream.LongStream;
 import java.util.stream.Stream;
 
 /**
@@ -21,12 +22,12 @@ public final class StreamUtils {
     }
 
     /**
-     * Constructs an infinite (although in practice bounded by Integer.MAX_VALUE) stream of integers 0, 1, 2, 3...
+     * Constructs an infinite (although in practice bounded by Long.MAX_VALUE) stream of longs 0, 1, 2, 3...
      * for use as indices.
-     * @return The stream of integers.
+     * @return The stream of longs.
      */
-    public static Stream<Integer> indices() {
-        return Stream.iterate(0, l -> l + 1);
+    public static LongStream indices() {
+        return LongStream.iterate(0L, l -> l + 1);
     }
 
     /**
@@ -36,7 +37,7 @@ public final class StreamUtils {
      * @return A stream of indexed values.
      */
     public static <T> Stream<Indexed<T>> zipWithIndex(Stream<T> source) {
-        return zip(indices(), source, Indexed::index);
+        return zip(indices().mapToObj(Long::valueOf), source, Indexed::index);
     }
 
     /**

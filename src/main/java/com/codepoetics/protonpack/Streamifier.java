@@ -93,6 +93,7 @@ public interface Streamifier {
     /**
      * Convert the supplied iterator into a stream with the required parallelism, sizedness and characteristics.
      * @param iterator The iterator to convert.
+     * @param <T> The type over which the iterator iterates and the resulting stream streams.
      * @return A stream streaming over the values provided by the iterator.
      */
     <T> Stream<T> streamify(Iterator<T> iterator);
