@@ -1,16 +1,19 @@
 package com.codepoetics.protonpack;
 
-import com.codepoetics.protonpack.iterators.SkipWhileIterator;
-import com.codepoetics.protonpack.iterators.TakeWhileIterator;
-import com.codepoetics.protonpack.iterators.UnfoldIterator;
-import com.codepoetics.protonpack.iterators.ZippingIterator;
+import com.codepoetics.protonpack.SkipUntilSpliterator;
+import com.codepoetics.protonpack.TakeWhileSpliterator;
+import com.codepoetics.protonpack.UnfoldSpliterator;
+import com.codepoetics.protonpack.ZippingSpliterator;
 
 import java.util.Optional;
 import java.util.Spliterator;
 import java.util.Spliterators;
-import java.util.function.*;
+import java.util.function.BiFunction;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.LongStream;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 /**
  * Utility class providing static methods for performing various operations on Streams.
@@ -53,27 +56,7 @@ public final class StreamUtils {
      * @return The constructed stream of zipped values.
      */
     public static <L, R, O> Stream<O> zip(Stream<L> lefts, Stream<R> rights, BiFunction<L, R, O> combiner) {
-        Spliterator<L> leftSpliterator = lefts.spliterator();
-        Spliterator<R> rightSpliterator = rights.spliterator();
-
-        int sharedCharacteristics =
-                leftSpliterator.characteristics()
-                        & rightSpliterator.characteristics()
-                        & ~(Spliterator.DISTINCT | Spliterator.SORTED);
-
-        boolean isParallel = lefts.isParallel() || rights.isParallel();
-
-        Streamifier streamifier = (isSized(sharedCharacteristics)
-                ? Streamifier.streamifier(isParallel).sized(
-                    Math.min(leftSpliterator.getExactSizeIfKnown(),
-                             rightSpliterator.getExactSizeIfKnown()))
-                : Streamifier.streamifier(isParallel).unsized())
-            .withCharacteristics(sharedCharacteristics);
-
-        return streamifier.<O>streamify(ZippingIterator.over(
-                Spliterators.iterator(leftSpliterator),
-                Spliterators.iterator(rightSpliterator),
-                combiner));
+        return StreamSupport.stream(ZippingSpliterator.zipping(lefts.spliterator(), rights.spliterator(), combiner), false);
     }
 
     private static boolean isSized(int characteristics) {
@@ -89,15 +72,7 @@ public final class StreamUtils {
      * @return The constructed stream.
      */
     public static <T> Stream<T> takeWhile(Stream<T> source, Predicate<T> condition) {
-        Spliterator<T> spliterator = source.spliterator();
-        int characteristics = spliterator.characteristics() & ~(Spliterator.SIZED);
-        return Streamifier
-                .streamifier(source.isParallel())
-                .unsized()
-                .withCharacteristics(characteristics)
-                .streamify(TakeWhileIterator.over(
-                        Spliterators.iterator(spliterator),
-                        condition));
+        return StreamSupport.stream(TakeWhileSpliterator.over(source.spliterator(), condition), false);
     }
 
     /**
@@ -121,15 +96,7 @@ public final class StreamUtils {
      * @return The constructed stream.
      */
     public static <T> Stream<T> skipWhile(Stream<T> source, Predicate<T> condition) {
-        Spliterator<T> spliterator = source.spliterator();
-        int characteristics = spliterator.characteristics() & ~(Spliterator.SIZED);
-        return Streamifier
-                .streamifier(source.isParallel())
-                .unsized()
-                .withCharacteristics(characteristics)
-                .streamify(SkipWhileIterator.over(
-                        Spliterators.iterator(spliterator),
-                        condition));
+        return StreamSupport.stream(SkipUntilSpliterator.over(source.spliterator(), condition.negate()), false);
     }
 
     /**
@@ -141,7 +108,7 @@ public final class StreamUtils {
      * @return The constructed stream.
      */
     public static <T> Stream<T> skipUntil(Stream<T> source, Predicate<T> condition) {
-        return skipWhile(source, condition.negate());
+        return StreamSupport.stream(SkipUntilSpliterator.over(source.spliterator(), condition), false);
     }
 
     /**
@@ -154,6 +121,6 @@ public final class StreamUtils {
      * @return The constructed stream.
      */
     public static <T> Stream<T> unfold(T seed, Function<T, Optional<T>> generator) {
-        return Streamifier.toStream(UnfoldIterator.over(seed, generator));
+        return StreamSupport.stream(UnfoldSpliterator.over(seed, generator), false);
     }
 }
