@@ -10,6 +10,16 @@ A small collection of ```Stream``` utilities for Java 8. Protonpack provides the
 * ```zip``` and ```zipWithIndex```
 * ```unfold```
 
+Available from Maven Central:
+
+```xml
+<dependency>
+    <groupId>com.codepoetics</groupId>
+    <artifactId>protonpack</artifactId>
+    <version>1.0</version>
+</dependency>
+```
+
 ## takeWhile
 
 Takes elements from the stream while the supplied condition is met. ```takeUntil``` does the same, but with the condition negated.
