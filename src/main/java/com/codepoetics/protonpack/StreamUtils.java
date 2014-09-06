@@ -1,16 +1,10 @@
 package com.codepoetics.protonpack;
 
-import com.codepoetics.protonpack.SkipUntilSpliterator;
-import com.codepoetics.protonpack.TakeWhileSpliterator;
-import com.codepoetics.protonpack.UnfoldSpliterator;
-import com.codepoetics.protonpack.ZippingSpliterator;
-
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.Spliterator;
-import java.util.Spliterators;
-import java.util.function.BiFunction;
-import java.util.function.Function;
-import java.util.function.Predicate;
+import java.util.function.*;
 import java.util.stream.LongStream;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -93,7 +87,7 @@ public final class StreamUtils {
      * @param source The source stream.
      * @param condition The condition to apply to elements of the source stream.
      * @param <T> The type over which the stream streams.
-     * @return The constructed stream.
+     * @return The constructed element-skipping stream.
      */
     public static <T> Stream<T> skipWhile(Stream<T> source, Predicate<T> condition) {
         return StreamSupport.stream(SkipUntilSpliterator.over(source.spliterator(), condition.negate()), false);
@@ -105,7 +99,7 @@ public final class StreamUtils {
      * @param source The source stream.
      * @param condition The condition to apply to elements of the source stream.
      * @param <T> The type over which the stream streams.
-     * @return The constructed stream.
+     * @return The constructed element-skipping stream.
      */
     public static <T> Stream<T> skipUntil(Stream<T> source, Predicate<T> condition) {
         return StreamSupport.stream(SkipUntilSpliterator.over(source.spliterator(), condition), false);
@@ -118,9 +112,90 @@ public final class StreamUtils {
      * @param seed The seed value.
      * @param generator The generator to use to create new values.
      * @param <T> The type over which the stream streams.
-     * @return The constructed stream.
+     * @return The constructed unfolding stream.
      */
     public static <T> Stream<T> unfold(T seed, Function<T, Optional<T>> generator) {
         return StreamSupport.stream(UnfoldSpliterator.over(seed, generator), false);
+    }
+
+    /**
+     * Construct a stream which interleaves the supplied streams, picking items using the supplied selector function.
+     *
+     * The selector function will be passed an array containing one value from each stream, or null if that stream
+     * has no more values, and must return the integer index of the value to accept. That value will become part of the
+     * interleaved stream, and the source stream at that index will advance to the next value.
+     *
+     * See the {@link com.codepoetics.protonpack.Selectors} class for ready-made selectors for round-robin and sorted
+     * item selection.
+     * @param selector The selector function to use.
+     * @param streams The streams to interleave.
+     * @param <T> The type over which the interleaved streams stream.
+     * @return The constructed interleaved stream.
+     */
+    public static <T> Stream<T> interleave(Function<T[], Integer> selector, Stream<T>... streams) {
+        Spliterator<T>[] spliterators = (Spliterator<T>[]) Stream.of(streams).map(s -> s.spliterator()).toArray(Spliterator[]::new);
+        return StreamSupport.stream(InterleavingSpliterator.interleaving(spliterators, selector), false);
+    }
+
+    /**
+     * Construct a stream which interleaves the supplied streams, picking items using the supplied selector function.
+     *
+     * The selector function will be passed an array containing one value from each stream, or null if that stream
+     * has no more values, and must return the integer index of the value to accept. That value will become part of the
+     * interleaved stream, and the source stream at that index will advance to the next value.
+     *
+     * See the {@link com.codepoetics.protonpack.Selectors} class for ready-made selectors for round-robin and sorted
+     * item selection.
+     * @param selector The selector function to use.
+     * @param streams The streams to interleave.
+     * @param <T> The type over which the interleaved streams stream.
+     * @return The constructed interleaved stream.
+     */
+    public static <T> Stream<T> interleave(Function<T[], Integer> selector, List<Stream<T>> streams) {
+        Spliterator<T>[] spliterators = (Spliterator<T>[]) streams.stream().map(s -> s.spliterator()).toArray(Spliterator[]::new);
+        return StreamSupport.stream(InterleavingSpliterator.interleaving(spliterators, selector), false);
+    }
+
+    /**
+     * Construct a stream which merges together values from the supplied streams, somewhat in the manner of the
+     * stream constructed by {@link com.codepoetics.protonpack.StreamUtils#zip(java.util.stream.Stream, java.util.stream.Stream, java.util.function.BiFunction)},
+     * but for an arbitrary number of streams and using a merger to merge the values from multiple streams
+     * into an accumulator.
+     *
+     * @param unitSupplier Supplies the initial "zero" or "unit" value for the accumulator.
+     * @param merger Merges each item from the collection of values taken from the source streams into the accumulator value.
+     * @param streams The streams to merge.
+     * @param <T> The type over which the merged streams stream.
+     * @param <O> The type of the accumulator, over which the constructed stream streams.
+     * @return The constructed merging stream.
+     */
+    public static <T, O> Stream<O> merge(Supplier<O> unitSupplier, BiFunction<O, T, O> merger, Stream<T>...streams) {
+        Spliterator<T>[] spliterators = (Spliterator<T>[]) Stream.of(streams).map(s -> s.spliterator()).toArray(Spliterator[]::new);
+        return StreamSupport.stream(MergingSpliterator.merging(spliterators, unitSupplier, merger), false);
+    }
+
+    /**
+     * Construct a stream which merges together values from the supplied streams into lists of values, somewhat in the manner of the
+     * stream constructed by {@link com.codepoetics.protonpack.StreamUtils#zip(java.util.stream.Stream, java.util.stream.Stream, java.util.function.BiFunction)},
+     * but for an arbitrary number of streams.
+     *
+     * @param streams The streams to merge.
+     * @param <T> The type over which the merged streams stream.
+     * @return The constructed merging stream of lists of T.
+     */
+    public static <T> Stream<List<T>> mergeToList(Stream<T>...streams) {
+        return merge(ArrayList::new, (l, x) -> { l.add(x); return l; }, streams);
+    }
+
+    /**
+     * Filter with the condition negated. Will throw away any members of the source stream that match the condition.
+     *
+     * @param source The source stream.
+     * @param predicate The filter condition.
+     * @param <T> The type over which the stream streams.
+     * @return The constructed rejecting stream.
+     */
+    public static <T> Stream<T> reject(Stream<T> source, Predicate<? super T> predicate) {
+        return source.filter(predicate.negate());
     }
 }
