@@ -21,7 +21,7 @@ public final class StreamUtils {
     /**
      * Constructs an infinite (although in practice bounded by Long.MAX_VALUE) stream of longs 0, 1, 2, 3...
      * for use as indices.
-     * @return The stream of longs.
+     * @return A stream of longs.
      */
     public static LongStream indices() {
         return LongStream.iterate(0L, l -> l + 1);
@@ -47,7 +47,7 @@ public final class StreamUtils {
      * @param <R> The type over which the "right" stream streams.
      * @param <O> The type created by the combiner out of pairs of "left" and "right" values, over which the resulting
      *           stream streams.
-     * @return The constructed stream of zipped values.
+     * @return A stream of zipped values.
      */
     public static <L, R, O> Stream<O> zip(Stream<L> lefts, Stream<R> rights, BiFunction<L, R, O> combiner) {
         return StreamSupport.stream(ZippingSpliterator.zipping(lefts.spliterator(), rights.spliterator(), combiner), false);
@@ -63,7 +63,7 @@ public final class StreamUtils {
      * @param source The source stream.
      * @param condition The condition to apply to elements of the source stream.
      * @param <T> The type over which the stream streams.
-     * @return The constructed stream.
+     * @return A condition-bounded stream.
      */
     public static <T> Stream<T> takeWhile(Stream<T> source, Predicate<T> condition) {
         return StreamSupport.stream(TakeWhileSpliterator.over(source.spliterator(), condition), false);
@@ -75,7 +75,7 @@ public final class StreamUtils {
      * @param source The source stream.
      * @param condition The condition to apply to elements of the source stream.
      * @param <T> The type over which the stream streams.
-     * @return The constructed stream.
+     * @return A condition-bounded stream.
      */
     public static <T> Stream<T> takeUntil(Stream<T> source, Predicate<T> condition) {
         return takeWhile(source, condition.negate());
@@ -87,7 +87,7 @@ public final class StreamUtils {
      * @param source The source stream.
      * @param condition The condition to apply to elements of the source stream.
      * @param <T> The type over which the stream streams.
-     * @return The constructed element-skipping stream.
+     * @return An element-skipping stream.
      */
     public static <T> Stream<T> skipWhile(Stream<T> source, Predicate<T> condition) {
         return StreamSupport.stream(SkipUntilSpliterator.over(source.spliterator(), condition.negate()), false);
@@ -99,7 +99,7 @@ public final class StreamUtils {
      * @param source The source stream.
      * @param condition The condition to apply to elements of the source stream.
      * @param <T> The type over which the stream streams.
-     * @return The constructed element-skipping stream.
+     * @return An element-skipping stream.
      */
     public static <T> Stream<T> skipUntil(Stream<T> source, Predicate<T> condition) {
         return StreamSupport.stream(SkipUntilSpliterator.over(source.spliterator(), condition), false);
@@ -112,7 +112,7 @@ public final class StreamUtils {
      * @param seed The seed value.
      * @param generator The generator to use to create new values.
      * @param <T> The type over which the stream streams.
-     * @return The constructed unfolding stream.
+     * @return An unfolding stream.
      */
     public static <T> Stream<T> unfold(T seed, Function<T, Optional<T>> generator) {
         return StreamSupport.stream(UnfoldSpliterator.over(seed, generator), false);
@@ -130,7 +130,7 @@ public final class StreamUtils {
      * @param selector The selector function to use.
      * @param streams The streams to interleave.
      * @param <T> The type over which the interleaved streams stream.
-     * @return The constructed interleaved stream.
+     * @return An interleaved stream.
      */
     public static <T> Stream<T> interleave(Function<T[], Integer> selector, Stream<T>... streams) {
         Spliterator<T>[] spliterators = (Spliterator<T>[]) Stream.of(streams).map(s -> s.spliterator()).toArray(Spliterator[]::new);
@@ -149,7 +149,7 @@ public final class StreamUtils {
      * @param selector The selector function to use.
      * @param streams The streams to interleave.
      * @param <T> The type over which the interleaved streams stream.
-     * @return The constructed interleaved stream.
+     * @return An interleaved stream.
      */
     public static <T> Stream<T> interleave(Function<T[], Integer> selector, List<Stream<T>> streams) {
         Spliterator<T>[] spliterators = (Spliterator<T>[]) streams.stream().map(s -> s.spliterator()).toArray(Spliterator[]::new);
@@ -167,7 +167,7 @@ public final class StreamUtils {
      * @param streams The streams to merge.
      * @param <T> The type over which the merged streams stream.
      * @param <O> The type of the accumulator, over which the constructed stream streams.
-     * @return The constructed merging stream.
+     * @return A merging stream.
      */
     public static <T, O> Stream<O> merge(Supplier<O> unitSupplier, BiFunction<O, T, O> merger, Stream<T>...streams) {
         Spliterator<T>[] spliterators = (Spliterator<T>[]) Stream.of(streams).map(s -> s.spliterator()).toArray(Spliterator[]::new);
@@ -181,7 +181,7 @@ public final class StreamUtils {
      *
      * @param streams The streams to merge.
      * @param <T> The type over which the merged streams stream.
-     * @return The constructed merging stream of lists of T.
+     * @return A merging stream of lists of T.
      */
     public static <T> Stream<List<T>> mergeToList(Stream<T>...streams) {
         return merge(ArrayList::new, (l, x) -> { l.add(x); return l; }, streams);
@@ -193,9 +193,20 @@ public final class StreamUtils {
      * @param source The source stream.
      * @param predicate The filter condition.
      * @param <T> The type over which the stream streams.
-     * @return The constructed rejecting stream.
+     * @return A rejecting stream.
      */
     public static <T> Stream<T> reject(Stream<T> source, Predicate<? super T> predicate) {
         return source.filter(predicate.negate());
+    }
+
+    /**
+     * Tap a stream so that as each item in the stream is released from the underlying spliterator, it is also sent to the tap.
+     * @param source The source stream.
+     * @param tap The tap which will consume each item that passes through the stream.
+     * @param <T> The type over which the stream streams.
+     * @return A tapped stream.
+     */
+    public static <T> Stream<T> tap(Stream<T> source, Consumer<? super T> tap) {
+        return StreamSupport.stream(TappedSpliterator.tapping(source.spliterator(), tap), source.isParallel());
     }
 }
