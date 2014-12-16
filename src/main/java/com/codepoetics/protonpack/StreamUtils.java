@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Spliterator;
 import java.util.function.*;
+import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -207,6 +208,40 @@ public final class StreamUtils {
      * @return A tapped stream.
      */
     public static <T> Stream<T> tap(Stream<T> source, Consumer<? super T> tap) {
-        return StreamSupport.stream(TappedSpliterator.tapping(source.spliterator(), tap), source.isParallel());
+        return source.peek(tap);
+    }
+    
+    /**
+     * Aggregates items from source stream into list of items while supplied predicate is true when evaluated on previous and current item.
+     * Can by seen as streaming alternative to Collectors.groupingBy when source stream is sorted by key. 
+     * @param source - source stream
+     * @param predicate - predicate specifying boundary between groups of items
+     * @return Stream of List<T> aggregated according to predicate  
+     */
+    public static <T> Stream<List<T>> aggregate(Stream<T> source, BiPredicate<T, T> predicate) {
+        return StreamSupport.stream(new AggregatingSpliterator<T>(source.spliterator(), 
+                (a, e) -> a.isEmpty() || predicate.test(a.get(a.size() - 1), e)), false);
+    }
+
+    /**
+     * Aggregates items from source stream into list of items with fixed size
+     * @param source - source stream
+     * @param size - size of the aggregated list
+     * @return Stream of List<T> with all list of size @size with possible exception of last List<T> 
+     */
+    public static <T> Stream<List<T>> aggregate(Stream<T> source, int size) {
+        if (size <= 0) throw new IllegalArgumentException("Positive size expected, was: "+size);
+        return StreamSupport.stream(new AggregatingSpliterator<T>(source.spliterator(), (a, e) -> a.size() < size), false);
+    }
+    
+    /**
+     * Aggregates items from source stream. Similar to @aggregate, but uses different predicate, evaluated on all items aggregated so far
+     * and next item from source stream.
+     * @param source - source stream
+     * @param predicate - predicate specifying boundary between groups of items
+     * @return Stream of List<T> aggregated according to predicate  
+     */
+    public static <T> Stream<List<T>> aggregateOnListCondition(Stream<T> source, BiPredicate<List<T>, T> predicate) {
+        return StreamSupport.stream(new AggregatingSpliterator<T>(source.spliterator(), predicate), false);
     }
 }
