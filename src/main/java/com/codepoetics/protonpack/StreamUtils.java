@@ -35,7 +35,7 @@ public final class StreamUtils {
      * @return A stream of indexed values.
      */
     public static <T> Stream<Indexed<T>> zipWithIndex(Stream<T> source) {
-        return null;
+        return zip(indices().mapToObj(Long::valueOf), source, Indexed::index);
     }
 
     /**
