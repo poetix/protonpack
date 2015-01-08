@@ -35,7 +35,7 @@ public final class StreamUtils {
      * @return A stream of indexed values.
      */
     public static <T> Stream<Indexed<T>> zipWithIndex(Stream<T> source) {
-        return zip(indices().mapToObj(Long::valueOf), source, Indexed::index);
+        return null;
     }
 
     /**
@@ -52,7 +52,7 @@ public final class StreamUtils {
      */
     public static <L, R, O> Stream<O> zip(Stream<L> lefts, Stream<R> rights, BiFunction<L, R, O> combiner) {
     	boolean isParallel = lefts.isParallel() && rights.isParallel();
-        return StreamSupport.stream(ZippingSpliterator.zipping(lefts.spliterator(), rights.spliterator(), combiner, isParallel), isParallel);
+        return StreamSupport.stream(ZippingSpliterator.zipping(lefts.spliterator(), rights.spliterator(), combiner), isParallel);
     }
 
     private static boolean isSized(int characteristics) {

@@ -7,21 +7,19 @@ import java.util.function.Consumer;
 
 class ZippingSpliterator<L, R, O> implements Spliterator<O> {
 
-    static <L, R, O> Spliterator<O> zipping(Spliterator<L> lefts, Spliterator<R> rights, BiFunction<L, R, O> combiner, boolean isParallel) {
-        return new ZippingSpliterator<>(lefts, rights, combiner, isParallel);
+    static <L, R, O> Spliterator<O> zipping(Spliterator<L> lefts, Spliterator<R> rights, BiFunction<L, R, O> combiner) {
+        return new ZippingSpliterator<>(lefts, rights, combiner);
     }
 
     private final Spliterator<L> lefts;
     private final Spliterator<R> rights;
     private final BiFunction<L, R, O> combiner;
     private boolean rightHadNext = false;
-    private boolean isParallel;
 
-    private ZippingSpliterator(Spliterator<L> lefts, Spliterator<R> rights, BiFunction<L, R, O> combiner, boolean isParallel) {
+    private ZippingSpliterator(Spliterator<L> lefts, Spliterator<R> rights, BiFunction<L, R, O> combiner) {
         this.lefts = lefts;
         this.rights = rights;
         this.combiner = combiner;
-        this.isParallel = isParallel;
     }
 
     @Override
@@ -37,9 +35,6 @@ class ZippingSpliterator<L, R, O> implements Spliterator<O> {
 
     @Override
     public Spliterator<O> trySplit() {
-    	if(!isParallel){
-    		return null;
-    	}
     	Spliterator<L> newLefts = lefts.trySplit();
     	if(newLefts == null){
     		return null;
@@ -48,7 +43,7 @@ class ZippingSpliterator<L, R, O> implements Spliterator<O> {
     	if(newRights == null){
     		return null;
     	}
-    	return zipping(newLefts, newRights, combiner, isParallel);
+    	return zipping(newLefts, newRights, combiner);
     }
 
     @Override
