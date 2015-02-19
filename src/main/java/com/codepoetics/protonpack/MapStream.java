@@ -41,7 +41,7 @@ public interface MapStream<K, V> extends Stream<Entry<K, V>> {
      * @return a new {@code MapStream<K, V>}
      */
     @SafeVarargs
-    public static <K, V> MapStream<K, V> of(Map<K, V>... maps) {
+    public static <K, V> MapStream<K, V> ofMaps(Map<K, V>... maps) {
         return new DefaultMapStream<>(Stream.of(maps).flatMap(m -> m.entrySet().stream()));
     }
     
