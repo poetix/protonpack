@@ -5,11 +5,6 @@
 
 package com.codepoetics.protonpack;
 
-import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.mapping;
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toMap;
-
 import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.Comparator;
 import java.util.List;
@@ -21,6 +16,8 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
+import static java.util.stream.Collectors.*;
+
 /**
  * A stream of {@code Map.Entry<K, V>}. 
  */
@@ -29,6 +26,8 @@ public interface MapStream<K, V> extends Stream<Entry<K, V>> {
     /**
      * Construct a {@code MapStream<K, V>} from the map
      * @param map - the map to build the stream from
+     * @param <K> - the type of the map keys
+     * @param <V> - the type of the map values
      * @return a new {@code MapStream<K, V>}
      */
     public static <K, V> MapStream<K, V> of(Map<K, V> map) {
@@ -37,7 +36,9 @@ public interface MapStream<K, V> extends Stream<Entry<K, V>> {
     
     /**
      * Construct a {@code MapStream<K, V>} from the map
-     * @param map - the map to build the stream from
+     * @param maps - the map to build the stream from
+     * @param <K> - the type of the map keys
+     * @param <V> - the type of the map values
      * @return a new {@code MapStream<K, V>}
      */
     @SafeVarargs
@@ -49,6 +50,8 @@ public interface MapStream<K, V> extends Stream<Entry<K, V>> {
      * Construct a {@code MapStream<K, V>} from a single key-value pair
      * @param key - the key
      * @param value - the value
+     * @param <K> - the type of the map keys
+     * @param <V> - the type of the map values
      * @return a new {@code MapStream<K, V>}
      */
     public static <K, V> MapStream<K, V> of(K key, V value) {
@@ -61,6 +64,8 @@ public interface MapStream<K, V> extends Stream<Entry<K, V>> {
      * @param value - value
      * @param key1 - key1
      * @param value1 - value1
+     * @param <K> - the type of the map keys
+     * @param <V> - the type of the map values
      * @return a new {@code MapStream<K, V>}
      */
     public static <K, V> MapStream<K, V> of(K key, V value, K key1, V value1) {
@@ -76,6 +81,8 @@ public interface MapStream<K, V> extends Stream<Entry<K, V>> {
      * @param value1 - value1
      * @param key2 - key2
      * @param value2 - value2
+     * @param <K> - the type of the map keys
+     * @param <V> - the type of the map values
      * @return a new {@code MapStream<K, V>}
      */
     public static <K, V> MapStream<K, V> of(K key, V value, K key1, V value1, K key2, V value2) {
@@ -94,6 +101,8 @@ public interface MapStream<K, V> extends Stream<Entry<K, V>> {
      * @param value2 - value2
      * @param key3 - key3
      * @param value3 - value3
+     * @param <K> - the type of the map keys
+     * @param <V> - the type of the map values
      * @return a new {@code MapStream<K, V>}
      */
     public static <K, V> MapStream<K, V> of(K key, V value, K key1, V value1, K key2, V value2, K key3, V value3) {
@@ -115,6 +124,8 @@ public interface MapStream<K, V> extends Stream<Entry<K, V>> {
      * @param value3 - value3
      * @param key4 - key4
      * @param value4 - value4
+     * @param <K> - the type of the map keys
+     * @param <V> - the type of the map values
      * @return a new {@code MapStream<K, V>}
      */
     public static <K, V> MapStream<K, V> of(K key, V value, K key1, V value1, K key2, V value2, K key3, V value3,  K key4, V value4) {
@@ -130,6 +141,7 @@ public interface MapStream<K, V> extends Stream<Entry<K, V>> {
      * make sure you call {@code mergeKeys} or that you provide a merge function when calling
      * {@code collect}
      * @param mapper - the key mapping to be applied
+     * @param <K1> the type to map the keys into
      * @return a new MapStream
      */
     default <K1> MapStream<K1, V> mapKeys(Function<? super K, ? extends K1> mapper) {
@@ -139,6 +151,7 @@ public interface MapStream<K, V> extends Stream<Entry<K, V>> {
     /**
      * Applies the mapping for each values in the map. 
      * @param mapper - the value mapping to be applied
+     * @param <V1> the type to map the values into
      * @return a new MapStream
      */
     default <V1> MapStream<K, V1> mapValues(Function<? super V, ? extends V1> mapper) {
@@ -151,6 +164,8 @@ public interface MapStream<K, V> extends Stream<Entry<K, V>> {
      * function when calling {@code collect}.
      * @param keyMapper - the key mapping to be applied
      * @param valueMapper - the value mapping to be applied
+     * @param <K1> the type to map the keys into
+     * @param <V1> the type to map the values into
      * @return a new MapStream
      */
     default <K1, V1> MapStream<K1, V1> mapEntries(Function<? super K, ? extends K1> keyMapper, Function<? super V, ? extends V1> valueMapper) {

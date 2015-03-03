@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Spliterator;
 import java.util.function.*;
-import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -238,7 +237,8 @@ public final class StreamUtils {
      * Can by seen as streaming alternative to Collectors.groupingBy when source stream is sorted by key. 
      * @param source - source stream
      * @param predicate - predicate specifying boundary between groups of items
-     * @return Stream of List<T> aggregated according to predicate  
+     * @param <T> The type over which the stream streams.
+     * @return Stream of List&lt;T&gt; aggregated according to predicate
      */
     public static <T> Stream<List<T>> aggregate(Stream<T> source, BiPredicate<T, T> predicate) {
         return StreamSupport.stream(new AggregatingSpliterator<T>(source.spliterator(), 
@@ -249,7 +249,8 @@ public final class StreamUtils {
      * Aggregates items from source stream into list of items with fixed size
      * @param source - source stream
      * @param size - size of the aggregated list
-     * @return Stream of List<T> with all list of size @size with possible exception of last List<T> 
+     * @param <T> The type over which the stream streams.
+     * @return Stream of List&lt;T&gt; with all list of size @size with possible exception of last List&lt;T&gt;
      */
     public static <T> Stream<List<T>> aggregate(Stream<T> source, int size) {
         if (size <= 0) throw new IllegalArgumentException("Positive size expected, was: "+size);
@@ -261,7 +262,8 @@ public final class StreamUtils {
      * and next item from source stream.
      * @param source - source stream
      * @param predicate - predicate specifying boundary between groups of items
-     * @return Stream of List<T> aggregated according to predicate  
+     * @param <T> The type over which the stream streams.
+     * @return Stream of List&lt;T&gt; aggregated according to predicate
      */
     public static <T> Stream<List<T>> aggregateOnListCondition(Stream<T> source, BiPredicate<List<T>, T> predicate) {
         return StreamSupport.stream(new AggregatingSpliterator<T>(source.spliterator(), predicate), false);
