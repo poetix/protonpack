@@ -59,7 +59,7 @@ public class ZipTest {
         Stream<String> streamB = Stream.of("aggravating", "banausic", "complaisant");
         Stream<String> streamC  = Stream.of("Apple", "Banana", "Carrot");
 
-        List<String> zipped = StreamUtils.zip(streamA, streamB, streamC, (a, b, c) -> a + " is for " + b + " " + b).collect(Collectors.toList());
+        List<String> zipped = StreamUtils.zip(streamA, streamB, streamC, (a, b, c) -> a + " is for " + b + " " + c).collect(Collectors.toList());
 
         assertThat(zipped, contains("A is for aggravating Apple", "B is for banausic Banana", "C is for complaisant Carrot"));
     }
