@@ -16,7 +16,7 @@ Available from Maven Central:
 <dependency>
     <groupId>com.codepoetics</groupId>
     <artifactId>protonpack</artifactId>
-    <version>1.0</version>
+    <version>1.2</version>
 </dependency>
 ```
 
