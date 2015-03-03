@@ -53,6 +53,28 @@ public final class StreamUtils {
         return StreamSupport.stream(ZippingSpliterator.zipping(lefts.spliterator(), rights.spliterator(), combiner), false);
     }
 
+    /**
+     * Zip together the "left", "middle" and "right" streams until any stream runs out of values.
+     * Each triple of values is combined into a single value using the supplied combiner function.
+     * @param lefts The "left" stream to zip.
+     * @param middles The "middle" stream to zip.
+     * @param rights The "right" stream to zip.
+     * @param combiner The function to combine "left", "middle" and "right" values.
+     * @param <L> The type over which the "left" stream streams.
+     * @param <M> The type over which the "middle" stream streams.
+     * @param <R> The type over which the "right" stream streams.
+     * @param <O> The type created by the combiner out of triples of "left", "middle" and "right" values, over which the resulting
+     *           stream streams.
+     * @return A stream of zipped values.
+     */
+    public static <L, M, R, O> Stream<O> zip(Stream<L> lefts, Stream<M> middles, Stream<R> rights, TriFunction<L, M, R, O> combiner) {
+        return StreamSupport.stream(TriZippingSpliterator.zipping(
+                lefts.spliterator(),
+                middles.spliterator(),
+                rights.spliterator(),
+                combiner), false);
+    }
+
     private static boolean isSized(int characteristics) {
         return (characteristics & Spliterator.SIZED) != 0;
     }
