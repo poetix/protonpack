@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Spliterator;
 import java.util.function.*;
-import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -52,6 +51,28 @@ public final class StreamUtils {
      */
     public static <L, R, O> Stream<O> zip(Stream<L> lefts, Stream<R> rights, BiFunction<L, R, O> combiner) {
         return StreamSupport.stream(ZippingSpliterator.zipping(lefts.spliterator(), rights.spliterator(), combiner), false);
+    }
+
+    /**
+     * Zip together the "left", "middle" and "right" streams until any stream runs out of values.
+     * Each triple of values is combined into a single value using the supplied combiner function.
+     * @param lefts The "left" stream to zip.
+     * @param middles The "middle" stream to zip.
+     * @param rights The "right" stream to zip.
+     * @param combiner The function to combine "left", "middle" and "right" values.
+     * @param <L> The type over which the "left" stream streams.
+     * @param <M> The type over which the "middle" stream streams.
+     * @param <R> The type over which the "right" stream streams.
+     * @param <O> The type created by the combiner out of triples of "left", "middle" and "right" values, over which the resulting
+     *           stream streams.
+     * @return A stream of zipped values.
+     */
+    public static <L, M, R, O> Stream<O> zip(Stream<L> lefts, Stream<M> middles, Stream<R> rights, TriFunction<L, M, R, O> combiner) {
+        return StreamSupport.stream(TriZippingSpliterator.zipping(
+                lefts.spliterator(),
+                middles.spliterator(),
+                rights.spliterator(),
+                combiner), false);
     }
 
     private static boolean isSized(int characteristics) {
@@ -216,7 +237,8 @@ public final class StreamUtils {
      * Can by seen as streaming alternative to Collectors.groupingBy when source stream is sorted by key. 
      * @param source - source stream
      * @param predicate - predicate specifying boundary between groups of items
-     * @return Stream of List<T> aggregated according to predicate  
+     * @param <T> The type over which the stream streams.
+     * @return Stream of List&lt;T&gt; aggregated according to predicate
      */
     public static <T> Stream<List<T>> aggregate(Stream<T> source, BiPredicate<T, T> predicate) {
         return StreamSupport.stream(new AggregatingSpliterator<T>(source.spliterator(), 
@@ -227,7 +249,8 @@ public final class StreamUtils {
      * Aggregates items from source stream into list of items with fixed size
      * @param source - source stream
      * @param size - size of the aggregated list
-     * @return Stream of List<T> with all list of size @size with possible exception of last List<T> 
+     * @param <T> The type over which the stream streams.
+     * @return Stream of List&lt;T&gt; with all list of size @size with possible exception of last List&lt;T&gt;
      */
     public static <T> Stream<List<T>> aggregate(Stream<T> source, int size) {
         if (size <= 0) throw new IllegalArgumentException("Positive size expected, was: "+size);
@@ -239,7 +262,8 @@ public final class StreamUtils {
      * and next item from source stream.
      * @param source - source stream
      * @param predicate - predicate specifying boundary between groups of items
-     * @return Stream of List<T> aggregated according to predicate  
+     * @param <T> The type over which the stream streams.
+     * @return Stream of List&lt;T&gt; aggregated according to predicate
      */
     public static <T> Stream<List<T>> aggregateOnListCondition(Stream<T> source, BiPredicate<List<T>, T> predicate) {
         return StreamSupport.stream(new AggregatingSpliterator<T>(source.spliterator(), predicate), false);

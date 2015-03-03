@@ -53,4 +53,15 @@ public class ZipTest {
                 Indexed.index(2, "Baz")));
     }
 
+    @Test public void
+    zips_a_trio_of_streams_of_same_length() {
+        Stream<String> streamA = Stream.of("A", "B", "C");
+        Stream<String> streamB = Stream.of("aggravating", "banausic", "complaisant");
+        Stream<String> streamC  = Stream.of("Apple", "Banana", "Carrot");
+
+        List<String> zipped = StreamUtils.zip(streamA, streamB, streamC, (a, b, c) -> a + " is for " + b + " " + c).collect(Collectors.toList());
+
+        assertThat(zipped, contains("A is for aggravating Apple", "B is for banausic Banana", "C is for complaisant Carrot"));
+    }
+
 }
