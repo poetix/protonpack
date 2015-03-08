@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import static java.util.Arrays.asList;
+import static java.util.stream.Collectors.maxBy;
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
@@ -43,6 +44,8 @@ public class WindowedTest {
     public void
     windowing_on__empty_list() {
         ArrayList<Integer> ints = new ArrayList<>();
+
+        ints.stream().collect(maxBy((a, b) -> a.toString().compareTo(b.toString())));
 
         List<List<Integer>> windows = StreamUtils.windowed(ints.stream(), 2).collect(toList());
 
