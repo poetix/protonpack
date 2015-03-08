@@ -141,6 +141,37 @@ public final class StreamUtils {
     }
 
     /**
+     * Constructs a stream that is a windowed view of the source stream of the size window size
+     * with a default overlap of one item
+     *
+     * @param source The source stream
+     * @param windowSize The window size
+     * @param <T> The type over which to stream
+     * @return A stream of lists representing the window
+     */
+    public static <T> Stream<List<T>> windowed(Stream<T> source, int windowSize){
+        return windowed(source, windowSize, 1);
+    }
+
+    /**
+     * Constructs a windowed stream where each element is a list of the window size
+     * and the skip is the offset from the start of each window.
+     *
+     * For example, a skip of size 1 is a traditional window a la ([1, 2, 3], [2, 3, 4] ...).
+     *
+     * A skip of size 2 for a window of size 3 would look like
+     * ([1, 2, 3], [3, 4, 5], ...)
+     *
+     * @param source The input stream
+     * @param windowSize The window size
+     * @param skip The skip amount between windows
+     * @param <T> The type over which to stream
+     * @return A stream of lists representing the windows
+     */
+    public static <T> Stream<List<T>> windowed(Stream<T> source, int windowSize, int skip){
+        return StreamSupport.stream(WindowedSpliterator.over(source.spliterator(), windowSize, skip), false);
+    }
+    /**
      * Construct a stream which interleaves the supplied streams, picking items using the supplied selector function.
      *
      * The selector function will be passed an array containing one value from each stream, or null if that stream
