@@ -1,14 +1,15 @@
 package com.codepoetics.protonpack;
 
-import static java.util.Arrays.*;
-import static java.util.stream.Collectors.*;
-import static org.hamcrest.MatcherAssert.*;
-import static org.hamcrest.Matchers.*;
+import org.junit.Test;
 
 import java.util.List;
 import java.util.stream.Stream;
 
-import org.junit.Test;
+import static java.util.Arrays.asList;
+import static java.util.stream.Collectors.toList;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.equalTo;
 
 public class AggregateTest {
 
@@ -44,5 +45,12 @@ public class AggregateTest {
         Stream<List<String>> aggregated = StreamUtils.aggregate(stream, 3);
         assertThat(aggregated.collect(toList()), contains(
                 asList("a1", "b1", "b2"), asList("c1")));
+    }
+
+    @Test public void
+    find_first_on_size2() {
+        Stream<String> stream = Stream.of("a1");
+        Stream<List<String>> aggregated = StreamUtils.aggregate(stream, 2);
+        assertThat(aggregated.findFirst().get(), equalTo(asList("a1")));
     }
 }
