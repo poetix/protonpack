@@ -33,7 +33,7 @@ public class WindowedTest {
     windowing_on_list_two_overlap() {
         Stream<Integer> integerStream = Stream.of(1, 2, 3, 4, 5);
 
-        List<List<Integer>> windows = StreamUtils.windowed(integerStream, 2, 2).collect(toList());
+        List<List<Integer>> windows = StreamUtils.windowed(integerStream, 3, 2).collect(toList());
 
         assertThat(windows, contains(
                 asList(1, 2, 3),

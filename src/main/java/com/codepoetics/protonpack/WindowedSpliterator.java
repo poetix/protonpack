@@ -36,6 +36,10 @@ class WindowedSpliterator<TSource> implements Spliterator<List<TSource>> {
 
     private void nextWindow() {
         for (int i = 0; i < overlap; i++) {
+            if(next.isEmpty()){
+                return;
+            }
+
             next.remove(0);
 
             source.tryAdvance(next::add);
@@ -84,11 +88,11 @@ class WindowedSpliterator<TSource> implements Spliterator<List<TSource>> {
 
     @Override
     public long estimateSize() {
-        return 0;
+        return source.estimateSize() / windowSize;
     }
 
     @Override
     public int characteristics() {
-        return 0;
+        return source.characteristics() & ~(Spliterator.SIZED | Spliterator.ORDERED);
     }
 }
