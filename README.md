@@ -9,6 +9,9 @@ A small collection of ```Stream``` utilities for Java 8. Protonpack provides the
 * ```skipWhile``` and ```skipUntil```
 * ```zip``` and ```zipWithIndex```
 * ```unfold```
+* ```MapStream```
+* ```aggregate```
+* ```Streamable<T>```
 
 Available from Maven Central:
 
@@ -16,7 +19,7 @@ Available from Maven Central:
 <dependency>
     <groupId>com.codepoetics</groupId>
     <artifactId>protonpack</artifactId>
-    <version>1.2</version>
+    <version>1.3</version>
 </dependency>
 ```
 
