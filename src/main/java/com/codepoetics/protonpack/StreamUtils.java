@@ -268,4 +268,14 @@ public final class StreamUtils {
     public static <T> Stream<List<T>> aggregateOnListCondition(Stream<T> source, BiPredicate<List<T>, T> predicate) {
         return StreamSupport.stream(new AggregatingSpliterator<T>(source.spliterator(), predicate), false);
     }
+
+    /**
+     * Converts an Optional value to a stream of 0..1 values
+     * @param optional source optional value
+     * @param <T> The type over the optional value
+     * @return Stream of the single item of type T or an empty stream
+     */
+    public static <T> Stream<T> of(Optional<T> optional) {
+        return optional.map(Stream::of).orElseGet(Stream::empty);
+    }
 }
