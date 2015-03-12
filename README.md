@@ -80,11 +80,11 @@ assertThat(unfolded.collect(Collectors.toList()),
            contains(1, 2, 3, 4, 5, 6, 7, 8, 9, 10));
 ```
 
-## of
+## stream
 
 Transforms a source type into a stream
 
-`of(Optional<T> optional):`
+`stream(Optional<T> optional):`
 ```java
-Stream<Item> items = idStream.flatMap(id -> StreamUtils.of(fetchItem(id));
+Stream<Item> items = idStream.flatMap(id -> StreamUtils.stream(fetchItem(id));
 ```

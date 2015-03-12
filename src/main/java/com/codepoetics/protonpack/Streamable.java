@@ -33,7 +33,7 @@ public interface Streamable<T> {
     }
 
     static <T> Streamable<T> of(Optional<T> optional) {
-        return () -> StreamUtils.of(optional);
+        return () -> StreamUtils.stream(optional);
     }
 
     @SafeVarargs

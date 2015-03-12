@@ -16,7 +16,7 @@ public class OptionalTest {
     public void
     stream_of_nonempty_optionals() {
         Stream<Integer> numbers = Stream.of(123, 456);
-        Stream<Integer> results = numbers.flatMap(n -> StreamUtils.of(maybeAdd3(n)));
+        Stream<Integer> results = numbers.flatMap(n -> StreamUtils.stream(maybeAdd3(n)));
         List<Integer> resultList = results.collect(Collectors.toList());
         assertEquals(Arrays.asList(126, 459), resultList);
     }
@@ -25,7 +25,7 @@ public class OptionalTest {
     public void
     stream_of_empty_optionals() {
         Stream<String> names = Stream.of("John", "Susan");
-        Stream<String> transformed = names.flatMap(s -> StreamUtils.of(Optional.empty()));
+        Stream<String> transformed = names.flatMap(s -> StreamUtils.stream(Optional.empty()));
         List<String> results = transformed.collect(Collectors.toList());
         assertEquals(Collections.emptyList(), results);
     }

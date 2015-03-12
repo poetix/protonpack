@@ -275,7 +275,7 @@ public final class StreamUtils {
      * @param <T> The type over the optional value
      * @return Stream of the single item of type T or an empty stream
      */
-    public static <T> Stream<T> of(Optional<T> optional) {
+    public static <T> Stream<T> stream(Optional<T> optional) {
         return optional.map(Stream::of).orElseGet(Stream::empty);
     }
 }
