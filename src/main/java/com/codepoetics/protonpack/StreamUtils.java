@@ -1,9 +1,6 @@
 package com.codepoetics.protonpack;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Spliterator;
+import java.util.*;
 import java.util.function.*;
 import java.util.stream.LongStream;
 import java.util.stream.Stream;
@@ -141,6 +138,65 @@ public final class StreamUtils {
     }
 
     /**
+     * Constructs a stream that is a windowed view of the source stream of the size window size
+     * with a default overlap of one item
+     *
+     * @param source The source stream
+     * @param windowSize The window size
+     * @param <T> The type over which to stream
+     * @return A stream of lists representing the window
+     */
+    public static <T> Stream<List<T>> windowed(Stream<T> source, int windowSize){
+        return windowed(source, windowSize, 1);
+    }
+
+    /**
+     * Constructs a windowed stream where each element is a list of the window size
+     * and the skip is the offset from the start of each window.
+     *
+     * For example, a skip of size 1 is a traditional window a la ([1, 2, 3], [2, 3, 4] ...).
+     *
+     * A skip of size 2 for a window of size 3 would look like
+     * ([1, 2, 3], [3, 4, 5], ...)
+     *
+     * @param source The input stream
+     * @param windowSize The window size
+     * @param skip The skip amount between windows
+     * @param <T> The type over which to stream
+     * @return A stream of lists representing the windows
+     */
+    public static <T> Stream<List<T>> windowed(Stream<T> source, int windowSize, int skip){
+        return StreamSupport.stream(WindowedSpliterator.over(source.spliterator(), windowSize, skip), false);
+    }
+
+    /**
+     * Constructs a stream that represents grouped run using the default comparator. This means
+     * that similar elements will get grouped into a list. I.e. given a list of [1,1,2,3,4,4]
+     * you will get a stream of ([1,1], [2], [3], [4, 4])
+     *
+     * @param source The input stream
+     * @param <T> The type over which to stream
+     * @return A stream of lists of grouped runs
+     */
+    public static <T extends Comparable<T>> Stream<List<T>> groupRuns(Stream<T> source){
+        return groupRuns(source, Comparable::compareTo);
+    }
+
+    /**
+     * Constructs a stream that represents grouped run using the default comparator. This means
+     * that similar elements will get grouped into a list. I.e. given a list of [1,1,2,3,4,4]
+     * you will get a stream of ([1,1], [2], [3], [4, 4])
+     *
+     * @param source The input stream
+     * @param comparator The comparator to determine if neighbor elements are the same
+     * @param <T> The type over which to stream
+     * @return A stream of lists of grouped runs
+     */
+    public static <T> Stream<List<T>> groupRuns(Stream<T> source, Comparator<T> comparator){
+        return StreamSupport.stream(new GroupRunsSpliterator<T>(source.spliterator(), comparator), false);
+    }
+
+    /**
      * Construct a stream which interleaves the supplied streams, picking items using the supplied selector function.
      *
      * The selector function will be passed an array containing one value from each stream, or null if that stream
@@ -267,5 +323,15 @@ public final class StreamUtils {
      */
     public static <T> Stream<List<T>> aggregateOnListCondition(Stream<T> source, BiPredicate<List<T>, T> predicate) {
         return StreamSupport.stream(new AggregatingSpliterator<T>(source.spliterator(), predicate), false);
+    }
+
+    /**
+     * Converts an Optional value to a stream of 0..1 values
+     * @param optional source optional value
+     * @param <T> The type over the optional value
+     * @return Stream of the single item of type T or an empty stream
+     */
+    public static <T> Stream<T> stream(Optional<T> optional) {
+        return optional.map(Stream::of).orElseGet(Stream::empty);
     }
 }

@@ -2,6 +2,8 @@ package com.codepoetics.protonpack;
 
 import org.junit.Test;
 
+import java.util.Arrays;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -31,5 +33,13 @@ public class StreamableTest {
         );
 
         assertThat(concatenated.toList(), contains(1, 2, 3, 5, 6, 7, 9, 10, 11));
+    }
+
+    @Test public void
+    streamable_of_optional() {
+        Streamable<Integer> streamableWithItem = Streamable.of(Optional.of(123));
+        Streamable<Integer> streamableEmpty = Streamable.of(Optional.empty());
+        assertEquals(Arrays.asList(123), streamableWithItem.toList());
+        assertEquals(Arrays.asList(), streamableEmpty.toList());
     }
 }
