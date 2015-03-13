@@ -79,3 +79,12 @@ Stream<Integer> unfolded = StreamUtils.unfold(1, i ->
 assertThat(unfolded.collect(Collectors.toList()),
            contains(1, 2, 3, 4, 5, 6, 7, 8, 9, 10));
 ```
+
+## stream
+
+Transforms a source type into a stream
+
+`stream(Optional<T> optional):`
+```java
+Stream<Item> items = idStream.flatMap(id -> StreamUtils.stream(fetchItem(id));
+```

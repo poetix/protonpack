@@ -32,6 +32,10 @@ public interface Streamable<T> {
         return () -> StreamSupport.stream(iterable.spliterator(), false);
     }
 
+    static <T> Streamable<T> of(Optional<T> optional) {
+        return () -> StreamUtils.stream(optional);
+    }
+
     @SafeVarargs
     static <T> Streamable<T> of(Streamable<T>...streamables) {
         return Stream.of(streamables).reduce(Streamable::concat).orElseGet(Streamable::empty);
