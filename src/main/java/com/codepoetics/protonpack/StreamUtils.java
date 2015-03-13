@@ -262,7 +262,10 @@ public final class StreamUtils {
      * @return A merging stream of lists of T.
      */
     public static <T> Stream<List<T>> mergeToList(Stream<T>...streams) {
-        return merge(ArrayList::new, (l, x) -> { l.add(x); return l; }, streams);
+        return merge(ArrayList::new, (l, x) -> {
+            l.add(x);
+            return l;
+        }, streams);
     }
 
     /**
@@ -275,17 +278,6 @@ public final class StreamUtils {
      */
     public static <T> Stream<T> reject(Stream<T> source, Predicate<? super T> predicate) {
         return source.filter(predicate.negate());
-    }
-
-    /**
-     * Tap a stream so that as each item in the stream is released from the underlying spliterator, it is also sent to the tap.
-     * @param source The source stream.
-     * @param tap The tap which will consume each item that passes through the stream.
-     * @param <T> The type over which the stream streams.
-     * @return A tapped stream.
-     */
-    public static <T> Stream<T> tap(Stream<T> source, Consumer<? super T> tap) {
-        return source.peek(tap);
     }
     
     /**
@@ -328,10 +320,20 @@ public final class StreamUtils {
     /**
      * Converts an Optional value to a stream of 0..1 values
      * @param optional source optional value
-     * @param <T> The type over the optional value
-     * @return Stream of the single item of type T or an empty stream
+     * @param <T> The type of the optional value
+     * @return Stream of a single item of type T or an empty stream
      */
     public static <T> Stream<T> stream(Optional<T> optional) {
         return optional.map(Stream::of).orElseGet(Stream::empty);
+    }
+
+    /**
+     * Converts an Iterable into a Stream.
+     * @param iterable The iterable to stream.
+     * @param <T> The type of the iterable
+     * @return Stream of the values returned by the iterable
+     */
+    public static <T> Stream<T> stream(Iterable<T> iterable) {
+        return StreamSupport.stream(iterable.spliterator(), false);
     }
 }

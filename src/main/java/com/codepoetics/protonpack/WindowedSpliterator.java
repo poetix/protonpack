@@ -5,15 +5,15 @@ import java.util.List;
 import java.util.Spliterator;
 import java.util.function.Consumer;
 
-class WindowedSpliterator<TSource> implements Spliterator<List<TSource>> {
-    private final Spliterator<TSource> source;
+class WindowedSpliterator<T> implements Spliterator<List<T>> {
+    private final Spliterator<T> source;
     private final int windowSize;
     private int overlap;
-    List<TSource> queue = new LinkedList<>();
-    List<TSource> next = new LinkedList<>();
+    List<T> queue = new LinkedList<>();
+    List<T> next = new LinkedList<>();
     private boolean windowSeeded;
 
-    public WindowedSpliterator(Spliterator<TSource> input, int windowSize, int overlap) {
+    public WindowedSpliterator(Spliterator<T> input, int windowSize, int overlap) {
         source = input;
 
         this.windowSize = windowSize;
@@ -58,7 +58,7 @@ class WindowedSpliterator<TSource> implements Spliterator<List<TSource>> {
         }
     }
 
-    private List<TSource> next() {
+    private List<T> next() {
         queue = new LinkedList<>(next);
 
         nextWindow();
@@ -71,7 +71,7 @@ class WindowedSpliterator<TSource> implements Spliterator<List<TSource>> {
     }
 
     @Override
-    public boolean tryAdvance(Consumer<? super List<TSource>> action) {
+    public boolean tryAdvance(Consumer<? super List<T>> action) {
         if (hasNext()) {
             action.accept(next());
 
@@ -82,13 +82,20 @@ class WindowedSpliterator<TSource> implements Spliterator<List<TSource>> {
     }
 
     @Override
-    public Spliterator<List<TSource>> trySplit() {
+    public Spliterator<List<T>> trySplit() {
         return null;
     }
 
     @Override
     public long estimateSize() {
-        return source.estimateSize() / windowSize;
+        long sourceSize = source.estimateSize();
+        if (sourceSize == 0) {
+            return 0;
+        }
+        if (sourceSize <= windowSize) {
+            return 1;
+        }
+        return sourceSize - windowSize;
     }
 
     @Override

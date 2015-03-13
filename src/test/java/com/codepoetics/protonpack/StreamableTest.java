@@ -28,8 +28,8 @@ public class StreamableTest {
 
     @Test public void
     concat_multiple_streamables() {
-        Streamable<Integer> concatenated = Streamable.of(
-            Streamable.of(1, 2, 3), Streamable.of(5, 6, 7), Streamable.of(9, 10, 11)
+        Streamable<Integer> concatenated = Streamable.ofAll(
+                Streamable.of(1, 2, 3), Streamable.of(5, 6, 7), Streamable.of(9, 10, 11)
         );
 
         assertThat(concatenated.toList(), contains(1, 2, 3, 5, 6, 7, 9, 10, 11));
@@ -41,5 +41,12 @@ public class StreamableTest {
         Streamable<Integer> streamableEmpty = Streamable.of(Optional.empty());
         assertEquals(Arrays.asList(123), streamableWithItem.toList());
         assertEquals(Arrays.asList(), streamableEmpty.toList());
+    }
+
+    @Test public void
+    streamable_of_iterable() {
+        Iterable<String> iterable = Arrays.asList("a", "b", "c");
+
+        assertThat(Streamable.of(iterable).toList(), contains("a", "b", "c"));
     }
 }
