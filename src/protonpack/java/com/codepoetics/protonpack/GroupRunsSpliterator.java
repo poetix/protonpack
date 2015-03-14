@@ -3,7 +3,9 @@ package com.codepoetics.protonpack;
 import java.util.*;
 import java.util.function.Consumer;
 
-public class GroupRunsSpliterator<T> implements Spliterator<List<T>> {
+import static java.util.Objects.requireNonNull;
+
+final class GroupRunsSpliterator<T> implements Spliterator<List<T>> {
     private Spliterator<T> source;
     private Comparator<T> comparator;
 
@@ -14,8 +16,8 @@ public class GroupRunsSpliterator<T> implements Spliterator<List<T>> {
     Optional<T> last = Optional.empty();
 
     public GroupRunsSpliterator(Spliterator<T> source, Comparator<T> comparator) {
-        this.source = source;
-        this.comparator = comparator;
+        this.source = requireNonNull(source);
+        this.comparator = requireNonNull(comparator);
     }
 
     @Override
@@ -24,35 +26,32 @@ public class GroupRunsSpliterator<T> implements Spliterator<List<T>> {
 
         List<T> neighbors = new LinkedList<>();
 
-        Boolean runBroken = false;
+        boolean runBroken = false;
 
         if(last.isPresent()){
             neighbors.add(last.get());
         }
 
-        for(;;){
+        while(true){
             if(source.tryAdvance(i -> current.item = i)) {
-                if( !last.isPresent() || comparator.compare(current.item, last.get()) == 0) {
+                if (!last.isPresent() || comparator.compare(current.item, last.get()) == 0) {
                     neighbors.add(current.item);
                 }
-                else{
+                else {
                     runBroken = true;
                 }
 
                 last = Optional.of(current.item);
 
-                if(runBroken){
+                if (runBroken) {
                     action.accept(neighbors);
-
                     return true;
                 }
             }
             // read to the end and its the last run
-            else if(!neighbors.isEmpty()){
+            else if (!neighbors.isEmpty()) {
                 action.accept(neighbors);
-
                 last = Optional.empty();
-
                 return true;
             }
             // source is empty

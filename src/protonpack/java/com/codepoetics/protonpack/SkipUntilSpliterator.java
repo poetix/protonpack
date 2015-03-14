@@ -4,7 +4,9 @@ import java.util.Spliterator;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-class SkipUntilSpliterator<T> implements Spliterator<T> {
+import static java.util.Objects.requireNonNull;
+
+final class SkipUntilSpliterator<T> implements Spliterator<T> {
 
     static <T> SkipUntilSpliterator<T> over(Spliterator<T> source, Predicate<T> condition) {
         return new SkipUntilSpliterator<>(source, condition);
@@ -15,8 +17,8 @@ class SkipUntilSpliterator<T> implements Spliterator<T> {
     private boolean conditionMet = false;
 
     private SkipUntilSpliterator(Spliterator<T> source, Predicate<T> condition) {
-        this.source = source;
-        this.condition = condition;
+        this.source = requireNonNull(source);
+        this.condition = requireNonNull(condition);
     }
 
     @Override

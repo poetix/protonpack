@@ -1,4 +1,4 @@
-package com.codepoetics.protonpack;
+package com.codepoetics.protonpack.function;
 
 import java.util.function.Function;
 

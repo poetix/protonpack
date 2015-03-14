@@ -4,7 +4,7 @@ import java.util.Spliterator;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
-class ZippingSpliterator<L, R, O> implements Spliterator<O> {
+final class ZippingSpliterator<L, R, O> implements Spliterator<O> {
 
     static <L, R, O> Spliterator<O> zipping(Spliterator<L> lefts, Spliterator<R> rights, BiFunction<L, R, O> combiner) {
         return new ZippingSpliterator<>(lefts, rights, combiner);

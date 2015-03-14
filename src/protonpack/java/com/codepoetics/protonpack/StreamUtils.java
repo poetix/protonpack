@@ -1,5 +1,7 @@
 package com.codepoetics.protonpack;
 
+import com.codepoetics.protonpack.function.TriFunction;
+
 import java.util.*;
 import java.util.function.*;
 import java.util.stream.LongStream;
@@ -203,7 +205,7 @@ public final class StreamUtils {
      * has no more values, and must return the integer index of the value to accept. That value will become part of the
      * interleaved stream, and the source stream at that index will advance to the next value.
      *
-     * See the {@link com.codepoetics.protonpack.Selectors} class for ready-made selectors for round-robin and sorted
+     * See the {@link com.codepoetics.protonpack.selector.Selectors} class for ready-made selectors for round-robin and sorted
      * item selection.
      * @param selector The selector function to use.
      * @param streams The streams to interleave.
@@ -222,7 +224,7 @@ public final class StreamUtils {
      * has no more values, and must return the integer index of the value to accept. That value will become part of the
      * interleaved stream, and the source stream at that index will advance to the next value.
      *
-     * See the {@link com.codepoetics.protonpack.Selectors} class for ready-made selectors for round-robin and sorted
+     * See the {@link com.codepoetics.protonpack.selector.Selectors} class for ready-made selectors for round-robin and sorted
      * item selection.
      * @param selector The selector function to use.
      * @param streams The streams to interleave.
@@ -289,7 +291,7 @@ public final class StreamUtils {
      * @return Stream of List&lt;T&gt; aggregated according to predicate
      */
     public static <T> Stream<List<T>> aggregate(Stream<T> source, BiPredicate<T, T> predicate) {
-        return StreamSupport.stream(new AggregatingSpliterator<T>(source.spliterator(), 
+        return StreamSupport.stream(new AggregatingSpliterator<T>(source.spliterator(),
                 (a, e) -> a.isEmpty() || predicate.test(a.get(a.size() - 1), e)), false);
     }
 

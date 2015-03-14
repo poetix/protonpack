@@ -4,6 +4,8 @@ import java.util.Optional;
 import java.util.Spliterator;
 import java.util.function.Consumer;
 
+import static java.util.Objects.requireNonNull;
+
 public class PeekableSpliterator<T> implements Spliterator<T> {
 
     public static <T> PeekableSpliterator<T> peeking(Spliterator<T> spliterator) {
@@ -14,7 +16,7 @@ public class PeekableSpliterator<T> implements Spliterator<T> {
     private Optional<T> buffer = Optional.empty();
 
     private PeekableSpliterator(Spliterator<T> source) {
-        this.source = source;
+        this.source = requireNonNull(source);
     }
 
     @Override

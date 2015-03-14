@@ -1,4 +1,6 @@
-package com.codepoetics.protonpack;
+package com.codepoetics.protonpack.selector;
+
+import com.codepoetics.protonpack.selector.Selector;
 
 import java.util.Comparator;
 import java.util.stream.Stream;

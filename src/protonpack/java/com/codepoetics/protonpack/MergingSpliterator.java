@@ -8,7 +8,9 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-class MergingSpliterator<T, O> implements Spliterator<O> {
+import static java.util.Objects.requireNonNull;
+
+final class MergingSpliterator<T, O> implements Spliterator<O> {
 
     public static <T, O> Spliterator<O> merging(Spliterator<T>[] sources, Supplier<O> unitSupplier, BiFunction<O, T, O> merger) {
         return new MergingSpliterator<>(sources, unitSupplier, merger);
@@ -19,9 +21,9 @@ class MergingSpliterator<T, O> implements Spliterator<O> {
     private final BiFunction<O, T, O> merger;
 
     private MergingSpliterator(Spliterator<T>[] sources, Supplier<O> unitSupplier, BiFunction<O, T, O> merger) {
-        this.sources = sources;
-        this.unitSupplier = unitSupplier;
-        this.merger = merger;
+        this.sources = requireNonNull(sources);
+        this.unitSupplier = requireNonNull(unitSupplier);
+        this.merger = requireNonNull(merger);
     }
 
     @Override
