@@ -1,9 +1,13 @@
 package com.codepoetics.protonpack;
 
+import com.codepoetics.protonpack.function.TriFunction;
+
 import java.util.Spliterator;
 import java.util.function.Consumer;
 
-class TriZippingSpliterator<L, M, R, O> implements Spliterator<O> {
+import static java.util.Objects.requireNonNull;
+
+final class TriZippingSpliterator<L, M, R, O> implements Spliterator<O> {
 
     static <L, M, R, O> Spliterator<O> zipping(Spliterator<L> lefts, Spliterator<M> middles, Spliterator<R> rights, TriFunction<L, M, R, O> combiner) {
         return new TriZippingSpliterator<>(lefts, middles, rights, combiner);
@@ -17,10 +21,10 @@ class TriZippingSpliterator<L, M, R, O> implements Spliterator<O> {
     private boolean rightHadNext = false;
 
     private TriZippingSpliterator(Spliterator<L> lefts, Spliterator<M> middles, Spliterator<R> rights, TriFunction<L, M, R, O> combiner) {
-        this.lefts = lefts;
-        this.rights = rights;
-        this.middles = middles;
-        this.combiner = combiner;
+        this.lefts = requireNonNull(lefts);
+        this.rights = requireNonNull(rights);
+        this.middles = requireNonNull(middles);
+        this.combiner = requireNonNull(combiner);
     }
 
     @Override

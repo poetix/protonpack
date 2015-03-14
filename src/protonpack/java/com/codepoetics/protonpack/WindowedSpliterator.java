@@ -5,17 +5,27 @@ import java.util.List;
 import java.util.Spliterator;
 import java.util.function.Consumer;
 
-class WindowedSpliterator<T> implements Spliterator<List<T>> {
+import static java.util.Objects.requireNonNull;
+
+final class WindowedSpliterator<T> implements Spliterator<List<T>> {
+
     private final Spliterator<T> source;
     private final int windowSize;
-    private int overlap;
-    List<T> queue = new LinkedList<>();
-    List<T> next = new LinkedList<>();
+    private final int overlap;
+
+    private List<T> queue = new LinkedList<>();
+    private List<T> next = new LinkedList<>();
+
     private boolean windowSeeded;
 
     public WindowedSpliterator(Spliterator<T> input, int windowSize, int overlap) {
-        source = input;
-
+        if(windowSize <= 0) {
+            throw new IllegalArgumentException("The window size must be > 0");
+        }
+        if(overlap < 0) {
+            throw new IllegalArgumentException("The overlap must be >= 0");
+        }
+        this.source = requireNonNull(input);
         this.windowSize = windowSize;
         this.overlap = overlap;
     }
@@ -27,10 +37,8 @@ class WindowedSpliterator<T> implements Spliterator<List<T>> {
     private boolean hasNext() {
         if (!windowSeeded) {
             seedWindow();
-
             windowSeeded = true;
         }
-
         return next.size() > 0;
     }
 
@@ -39,9 +47,7 @@ class WindowedSpliterator<T> implements Spliterator<List<T>> {
             if(next.isEmpty()){
                 return;
             }
-
             next.remove(0);
-
             source.tryAdvance(next::add);
         }
     }
@@ -74,10 +80,8 @@ class WindowedSpliterator<T> implements Spliterator<List<T>> {
     public boolean tryAdvance(Consumer<? super List<T>> action) {
         if (hasNext()) {
             action.accept(next());
-
             return true;
         }
-
         return false;
     }
 

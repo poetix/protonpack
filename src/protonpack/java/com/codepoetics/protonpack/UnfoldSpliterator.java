@@ -5,6 +5,8 @@ import java.util.Spliterator;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import static java.util.Objects.requireNonNull;
+
 class UnfoldSpliterator<T> implements Spliterator<T> {
 
     static <T> UnfoldSpliterator<T> over(T seed, Function<T, Optional<T>> generator) {
@@ -15,8 +17,8 @@ class UnfoldSpliterator<T> implements Spliterator<T> {
     private final Function<T, Optional<T>> generator;
 
     private UnfoldSpliterator(T seed, Function<T, Optional<T>> generator) {
-        this.current = Optional.of(seed);
-        this.generator = generator;
+        this.current = Optional.ofNullable(seed);
+        this.generator = requireNonNull(generator);
     }
 
     @Override

@@ -6,8 +6,10 @@ import java.util.Spliterator;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 
+import static java.util.Objects.requireNonNull;
 
-class AggregatingSpliterator<I> implements Spliterator<List<I>> {
+
+final class AggregatingSpliterator<I> implements Spliterator<List<I>> {
     
     private final Spliterator<I> source;
     private final BiPredicate<List<I>, I> condition;
@@ -15,8 +17,8 @@ class AggregatingSpliterator<I> implements Spliterator<List<I>> {
     private List<I> currentSlide = new ArrayList<>();
 
     AggregatingSpliterator(Spliterator<I> source, BiPredicate<List<I>, I> predicate) {
-        this.source = source;
-        this.condition = predicate;
+        this.source = requireNonNull(source);
+        this.condition = requireNonNull(predicate);
     }
 
     @Override

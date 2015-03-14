@@ -42,7 +42,7 @@ public class WindowedTest {
 
     @Test
     public void
-    windowing_on__empty_list() {
+    windowing_on_empty_list() {
         ArrayList<Integer> ints = new ArrayList<>();
 
         ints.stream().collect(maxBy((a, b) -> a.toString().compareTo(b.toString())));
@@ -50,5 +50,17 @@ public class WindowedTest {
         List<List<Integer>> windows = StreamUtils.windowed(ints.stream(), 2).collect(toList());
 
         assertThat(windows, iterableWithSize(0));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void
+    windowing_on_non_positive_window_size() {
+        StreamUtils.windowed(Stream.empty(), 0);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void
+    windowing_on_negative_overlap() {
+        StreamUtils.windowed(Stream.empty(), 1, -1);
     }
 }

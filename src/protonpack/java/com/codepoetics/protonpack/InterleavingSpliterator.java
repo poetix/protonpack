@@ -7,7 +7,7 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-class InterleavingSpliterator<T> implements Spliterator<T> {
+final class InterleavingSpliterator<T> implements Spliterator<T> {
 
     public static <T> Spliterator<T> interleaving(Spliterator<T>[] spliterators, Function<T[], Integer> selector) {
         Supplier<T[]> bufferedValues = () -> {

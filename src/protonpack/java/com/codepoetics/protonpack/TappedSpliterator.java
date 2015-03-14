@@ -3,6 +3,8 @@ package com.codepoetics.protonpack;
 import java.util.Spliterator;
 import java.util.function.Consumer;
 
+import static java.util.Objects.requireNonNull;
+
 class TappedSpliterator<T> implements Spliterator<T> {
 
     public static <T> TappedSpliterator<T> tapping(Spliterator<T> source, Consumer<? super T> tap) {
@@ -13,8 +15,8 @@ class TappedSpliterator<T> implements Spliterator<T> {
     private final Consumer<? super T> tap;
 
     TappedSpliterator(Spliterator<T> source, Consumer<? super T> tap) {
-        this.source = source;
-        this.tap = tap;
+        this.source = requireNonNull(source);
+        this.tap = requireNonNull(tap);
     }
 
     @Override
