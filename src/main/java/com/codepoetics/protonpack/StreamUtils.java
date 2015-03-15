@@ -1,5 +1,7 @@
 package com.codepoetics.protonpack;
 
+import com.codepoetics.protonpack.functions.TriFunction;
+
 import java.util.*;
 import java.util.function.*;
 import java.util.stream.LongStream;
@@ -203,7 +205,7 @@ public final class StreamUtils {
      * has no more values, and must return the integer index of the value to accept. That value will become part of the
      * interleaved stream, and the source stream at that index will advance to the next value.
      *
-     * See the {@link com.codepoetics.protonpack.Selectors} class for ready-made selectors for round-robin and sorted
+     * See the {@link com.codepoetics.protonpack.selectors.Selectors} class for ready-made selectors for round-robin and sorted
      * item selection.
      * @param selector The selector function to use.
      * @param streams The streams to interleave.
@@ -222,7 +224,7 @@ public final class StreamUtils {
      * has no more values, and must return the integer index of the value to accept. That value will become part of the
      * interleaved stream, and the source stream at that index will advance to the next value.
      *
-     * See the {@link com.codepoetics.protonpack.Selectors} class for ready-made selectors for round-robin and sorted
+     * See the {@link com.codepoetics.protonpack.selectors.Selectors} class for ready-made selectors for round-robin and sorted
      * item selection.
      * @param selector The selector function to use.
      * @param streams The streams to interleave.

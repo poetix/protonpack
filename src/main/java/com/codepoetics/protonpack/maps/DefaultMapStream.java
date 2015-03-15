@@ -3,7 +3,7 @@
  * Date :  		24 déc. 2014
  */
 
-package com.codepoetics.protonpack;
+package com.codepoetics.protonpack.maps;
 
 import java.util.Comparator;
 import java.util.Iterator;

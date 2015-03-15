@@ -1,5 +1,7 @@
 package com.codepoetics.protonpack;
 
+import com.codepoetics.protonpack.functions.TriFunction;
+
 import java.util.Spliterator;
 import java.util.function.Consumer;
 

@@ -1,5 +1,6 @@
 package com.codepoetics.protonpack;
 
+import com.codepoetics.protonpack.selectors.Selectors;
 import org.junit.Test;
 
 import java.util.Comparator;
