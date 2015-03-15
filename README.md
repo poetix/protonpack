@@ -12,6 +12,7 @@ A small collection of ```Stream``` utilities for Java 8. Protonpack provides the
 * ```MapStream```
 * ```aggregate```
 * ```Streamable<T>```
+* ```unique``` collector
 
 Available from Maven Central:
 
@@ -19,7 +20,7 @@ Available from Maven Central:
 <dependency>
     <groupId>com.codepoetics</groupId>
     <artifactId>protonpack</artifactId>
-    <version>1.3</version>
+    <version>1.4</version>
 </dependency>
 ```
 
@@ -87,4 +88,23 @@ Transforms a source type into a stream
 `stream(Optional<T> optional):`
 ```java
 Stream<Item> items = idStream.flatMap(id -> StreamUtils.stream(fetchItem(id));
+```
+
+## Streamable<T>
+
+Streamable is to Stream as Iterable is to Iterator. Useful when you will want to stream repeatedly over some source.
+
+## unique
+
+A collector that returns the one and only item in a stream, if present, or throws an exception if multiple items are found.
+
+```java
+assertThat(Stream.of(1, 2, 3).filter(i -> i > 3).collect(CollectorUtils.unique()),
+           equalTo(Optional.empty()));
+
+assertThat(Stream.of(1, 2, 3).filter(i -> i > 2).collect(CollectorUtils.unique()),
+           equalTo(Optional.of(3)));
+
+// Throws NonUniqueValueException
+Stream.of(1, 2, 3).filter(i -> i > 1).collect(CollectorUtils.unique());
 ```
