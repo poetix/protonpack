@@ -3,7 +3,7 @@ package com.codepoetics.protonpack;
 import java.util.*;
 import java.util.function.Consumer;
 
-public class GroupRunsSpliterator<T> implements Spliterator<List<T>> {
+class GroupRunsSpliterator<T> implements Spliterator<List<T>> {
     private Spliterator<T> source;
     private Comparator<T> comparator;
 

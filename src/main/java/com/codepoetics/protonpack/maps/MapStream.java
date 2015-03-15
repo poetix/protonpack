@@ -182,6 +182,7 @@ public interface MapStream<K, V> extends Stream<Entry<K, V>> {
     
     /**
      * Merge keys of the Stream into a new Stream with the merge function provided
+     * @param mergeFunction The merge function to use
      * @return a new MapStream
      */
     default MapStream<K, V> mergeKeys(BinaryOperator<V> mergeFunction) {

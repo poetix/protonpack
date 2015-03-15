@@ -75,7 +75,8 @@ public final class CollectorUtils {
     }
 
     /**
-     * A collector that returns the single member of a stream (if present), or throws a @NonUniqueValueException if more
+     * A collector that returns the single member of a stream (if present), or throws a
+     * {@link com.codepoetics.protonpack.collectors.NonUniqueValueException} if more
      * than one item is found.
      * @param <T> The type of the items in the stream.
      * @return The collector.
