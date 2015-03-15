@@ -184,7 +184,7 @@ public interface Streamable<T> extends Supplier<Stream<T>> {
     /**
      * Stream this streamable, and collect the stream with the supplied collector.
      * @param collector The collector to use to collect streamed values.
-     * @param <O></O> The output type of the collector.
+     * @param <O> The output type of the collector.
      * @return The collected result.
      */
     default <O> O collect(Collector<T, ?, O> collector) {
