@@ -14,6 +14,8 @@ A small collection of ```Stream``` utilities for Java 8. Protonpack provides the
 * ```Streamable<T>```
 * ```unique``` collector
 
+For full API documentation, see (http://poetix.github.io/protonpack).
+
 Available from Maven Central:
 
 ```xml
