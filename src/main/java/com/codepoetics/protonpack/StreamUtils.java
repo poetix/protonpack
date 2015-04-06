@@ -320,6 +320,16 @@ public final class StreamUtils {
     }
 
     /**
+     * Converts nulls into an empty stream, and non-null values into a stream with one element.
+     * @param nullable The nullable value to convert.
+     * @param <T> The type of the value.
+     * @return A stream of zero or one values.
+     */
+    public static <T> Stream<T> streamNullable(T nullable) {
+        return null == nullable ? Stream.empty() : Stream.of(nullable);
+    }
+
+    /**
      * Converts an Optional value to a stream of 0..1 values
      * @param optional source optional value
      * @param <T> The type of the optional value
