@@ -3,6 +3,7 @@ package com.codepoetics.protonpack.collectors;
 import java.util.Comparator;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import java.util.stream.Collector;
 
@@ -11,7 +12,7 @@ import java.util.stream.Collector;
  */
 public final class CollectorUtils {
 
-    CollectorUtils() {
+    private CollectorUtils() {
     }
 
     /**
@@ -102,5 +103,17 @@ public final class CollectorUtils {
     private static <T> AtomicReference<T> uniqueCombine(AtomicReference<T> a1, AtomicReference<T> a2) {
         uniqueAccumulate(a1, a2.get());
         return a1;
+    }
+
+    /**
+     * A combiner for all the cases when you don't intend to reduce/collect on a parallel stream.
+     * Will throw an {@link java.lang.IllegalStateException} if it is ever called.
+     * @param <T> The type of partial result you don't intend to combine.
+     * @return A combiner that throws an exception instead of combining.
+     */
+    public static <T> BinaryOperator<T> noCombiner() {
+        return (t1, t2) -> {
+            throw new IllegalStateException("No combiner supplied for merging parallel results");
+        };
     }
 }
