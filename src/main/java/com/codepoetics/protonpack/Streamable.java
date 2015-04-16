@@ -138,6 +138,16 @@ public interface Streamable<T> extends Supplier<Stream<T>> {
         return transform(s -> s.filter(predicate));
     }
 
+
+    /**
+     * Transform this streamable's streams with the supplied filter predicate, rejecting items which match the predicate.
+     * @param predicate The filter predicate to apply.
+     * @return A streamable which produces the transformed streams.
+     */
+    default Streamable<T> reject(Predicate<? super T> predicate) {
+        return transform(s -> s.filter(predicate.negate()));
+    }
+
     /**
      * Transform this streamable's streams by sorting them.
      * @param comparator The comparator to use in sorting.
