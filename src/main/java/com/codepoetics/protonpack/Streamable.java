@@ -248,4 +248,43 @@ public interface Streamable<T> extends Supplier<Stream<T>> {
         return stream().toArray(arrayConstructor);
     }
 
+    /**
+     * Stream this streamable, and collect the stream into a Seq.
+     * @return The collected result.
+     */
+    default Seq<T> toSeq() {
+        return Seq.of(stream());
+    }
+
+    /**
+     * Stream and reduce the streamable, using the supplied identity, accumulator and combiner.
+     * @param identity The identity to use when reducing.
+     * @param accumulator The accumulator to use when reducing.
+     * @param combiner The combiner to use when reducing.
+     * @param <U> The type of the result.
+     * @return The reduced result.
+     */
+    default <U> U reduce(U identity, BiFunction<U, T, U> accumulator, BinaryOperator<U> combiner){
+        return get().reduce(identity, accumulator, combiner);
+    }
+
+    /**
+     * Stream and reduce the streamable, using the supplied accumulator.
+     * @param accumulator The accumulator to use when reducing.
+     * @return The reduced result.
+     */
+    default Optional<T> reduce(BinaryOperator<T> accumulator) {
+        return get().reduce(accumulator);
+    }
+
+    /**
+     * Stream and reduce the streamable, using the supplied identity and accumulator.
+     * @param identity The identity to use when reducing.
+     * @param accumulator The accumulator to use when reducing.
+     * @return The reduced result.
+     */
+    default T reduce(T identity, BinaryOperator<T> accumulator) {
+        return get().reduce(identity, accumulator);
+    }
+
 }
