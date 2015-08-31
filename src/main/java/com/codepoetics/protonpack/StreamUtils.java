@@ -161,6 +161,10 @@ public final class StreamUtils {
      * A skip of size 2 for a window of size 3 would look like
      * ([1, 2, 3], [3, 4, 5], ...)
      *
+     * If the stream finishes, the last window is guaranteed to be of the desired size (possible data loss).
+     *
+     * A stream [1, 2, 3] with a size 2 and skip 2 will result in ([1,2])
+     *
      * @param source The input stream
      * @param windowSize The window size
      * @param skip The skip amount between windows
@@ -168,7 +172,30 @@ public final class StreamUtils {
      * @return A stream of lists representing the windows
      */
     public static <T> Stream<List<T>> windowed(Stream<T> source, int windowSize, int skip){
-        return StreamSupport.stream(WindowedSpliterator.over(source.spliterator(), windowSize, skip), false);
+        return windowed(source, windowSize, skip, false);
+    }
+
+    /**
+     * Constructs a windowed stream where each element is a list of the window size
+     * and the skip is the offset from the start of each window.
+     *
+     * For example, a skip of size 1 is a traditional window a la ([1, 2, 3], [2, 3, 4] ...).
+     *
+     * A skip of size 2 for a window of size 3 would look like
+     * ([1, 2, 3], [3, 4, 5], ...)
+     *
+     * If the stream finishes, the last windows may have a window size lesser than the desired size. This is allowed
+     * via the allowLesserSize parameter.
+     *
+     * @param source The input stream
+     * @param windowSize The window size
+     * @param skip The skip amount between windows
+     * @param allowLesserSize Allow end of stream windows to have a lower size for completion
+     * @param <T> The type over which to stream
+     * @return A stream of lists representing the windows
+     */
+    public static <T> Stream<List<T>> windowed(Stream<T> source, int windowSize, int skip, boolean allowLesserSize){
+        return StreamSupport.stream(WindowedSpliterator.over(source.spliterator(), windowSize, skip, allowLesserSize), false);
     }
 
     /**
