@@ -9,19 +9,21 @@ class WindowedSpliterator<T> implements Spliterator<List<T>> {
     private final Spliterator<T> source;
     private final int windowSize;
     private int overlap;
+    private boolean allowLesserSize;
     List<T> queue = new LinkedList<>();
     List<T> next = new LinkedList<>();
     private boolean windowSeeded;
 
-    public WindowedSpliterator(Spliterator<T> input, int windowSize, int overlap) {
+    public WindowedSpliterator(Spliterator<T> input, int windowSize, int overlap, boolean allowLesserSize) {
         source = input;
 
         this.windowSize = windowSize;
         this.overlap = overlap;
+        this.allowLesserSize = allowLesserSize;
     }
 
-    static <T> WindowedSpliterator<T> over(Spliterator<T> source, int windowSize, int overlap) {
-        return new WindowedSpliterator<>(source, windowSize, overlap);
+    static <T> WindowedSpliterator<T> over(Spliterator<T> source, int windowSize, int overlap, boolean allowLesserSize) {
+        return new WindowedSpliterator<>(source, windowSize, overlap, allowLesserSize);
     }
 
     private boolean hasNext() {
@@ -63,8 +65,10 @@ class WindowedSpliterator<T> implements Spliterator<List<T>> {
 
         nextWindow();
 
-        if (next.size() != windowSize) {
-            next.clear();
+        if (!allowLesserSize) {
+            if (next.size() != windowSize) {
+                next.clear();
+            }
         }
 
         return queue;
