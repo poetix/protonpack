@@ -79,7 +79,7 @@ public interface Streamable<T> extends Supplier<Stream<T>> {
      */
     @SafeVarargs
     static <T> Streamable<T> ofAll(Streamable<T>...streamables) {
-        return Stream.of(streamables).reduce(Streamable::concat).orElseGet(Streamable::empty);
+        return Stream.of(streamables).reduce(Streamable::concatenate).orElseGet(Streamable::empty);
     }
 
     /**
@@ -95,7 +95,7 @@ public interface Streamable<T> extends Supplier<Stream<T>> {
      * @param streamable The streamable to concatenate.
      * @return A concatenated streamable, which streams over the concatenation of the streams produces by its source streamables.
      */
-    default Streamable<T> concat(Streamable<T> streamable) {
+    default Streamable<T> concatenate(Streamable<T> streamable) {
         return () -> Stream.concat(stream(), streamable.stream());
     }
 

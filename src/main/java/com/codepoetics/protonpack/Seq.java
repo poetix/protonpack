@@ -102,7 +102,7 @@ public interface Seq<T> extends Streamable<T> {
      * @return The two sequences concatenated.
      */
     default Seq<T> append(Seq<T> items) {
-        return concat(items).toSeq().reverse();
+        return concatenate(items).toSeq().reverse();
     }
 
     /**
