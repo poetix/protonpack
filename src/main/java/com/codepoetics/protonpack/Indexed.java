@@ -56,6 +56,6 @@ public class Indexed<T> {
             return false;
         }
         final Indexed other = (Indexed) obj;
-        return Objects.equals(this.index, other.index) && Objects.equals(this.value, other.value);
+        return Objects.equals(index, other.index) && Objects.equals(value, other.value);
     }
 }

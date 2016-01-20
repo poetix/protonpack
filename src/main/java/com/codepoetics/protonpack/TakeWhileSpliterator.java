@@ -1,5 +1,6 @@
 package com.codepoetics.protonpack;
 
+import java.util.Comparator;
 import java.util.Spliterator;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -42,5 +43,10 @@ class TakeWhileSpliterator<T> implements Spliterator<T> {
     @Override
     public int characteristics() {
         return source.characteristics() &~ Spliterator.SIZED;
+    }
+
+    @Override
+    public Comparator<? super T> getComparator() {
+        return source.getComparator();
     }
 }

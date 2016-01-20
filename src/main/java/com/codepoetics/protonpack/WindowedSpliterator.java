@@ -1,5 +1,8 @@
 package com.codepoetics.protonpack;
 
+import com.codepoetics.protonpack.comparators.Comparators;
+
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Spliterator;
@@ -106,4 +109,11 @@ class WindowedSpliterator<T> implements Spliterator<List<T>> {
     public int characteristics() {
         return source.characteristics() & ~(Spliterator.SIZED | Spliterator.ORDERED);
     }
+
+    @Override
+    public Comparator<? super List<T>> getComparator() {
+        Comparator<? super T> comparator = source.getComparator();
+        return comparator == null ? null : Comparators.toListComparator(comparator);
+    }
+
 }

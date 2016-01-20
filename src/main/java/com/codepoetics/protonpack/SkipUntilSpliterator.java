@@ -1,10 +1,11 @@
 package com.codepoetics.protonpack;
 
+import java.util.Comparator;
 import java.util.Spliterator;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-class SkipUntilSpliterator<T> implements Spliterator<T> {
+class SkipUntilSpliterator<T> implements Spliterator<T>  {
 
     static <T> SkipUntilSpliterator<T> over(Spliterator<T> source, Predicate<T> condition) {
         return new SkipUntilSpliterator<>(source, condition);
@@ -55,5 +56,10 @@ class SkipUntilSpliterator<T> implements Spliterator<T> {
     @Override
     public int characteristics() {
         return source.characteristics() &~ Spliterator.SIZED;
+    }
+
+    @Override
+    public Comparator<? super T> getComparator() {
+        return source.getComparator();
     }
 }
