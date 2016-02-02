@@ -349,8 +349,20 @@ public final class StreamUtils {
      * @param nullable The nullable value to convert.
      * @param <T> The type of the value.
      * @return A stream of zero or one values.
+     * @deprecated use {@link StreamUtils#ofNullableValue(Object)}
      */
     public static <T> Stream<T> streamNullable(T nullable) {
+        return ofNullableValue(nullable);
+    }
+
+    // can't be named ofNullable() due to overloading difficulty with erasure of generic type
+    /**
+     * Converts nulls into an empty stream, and non-null values into a stream with one element.
+     * @param nullable The nullable value to convert.
+     * @param <T> The type of the value.
+     * @return A stream of zero or one values.
+     */
+    public static <T> Stream<T> ofNullableValue(T nullable) {
         return null == nullable ? Stream.empty() : Stream.of(nullable);
     }
 
@@ -369,8 +381,19 @@ public final class StreamUtils {
      * @param iterable The iterable to stream.
      * @param <T> The type of the iterable
      * @return Stream of the values returned by the iterable
+     * @deprecated use {@link StreamUtils#ofNullable(Iterable)}
      */
     public static <T> Stream<T> stream(Iterable<T> iterable) {
+        return ofNullable(iterable);
+    }
+
+    /**
+     * Converts an Iterable into a Stream.
+     * @param iterable The iterable to stream.
+     * @param <T> The type of the iterable
+     * @return Stream of the values returned by the iterable
+     */
+    public static <T> Stream<T> ofNullable(Iterable<T> iterable) {
         return null == iterable ? Stream.empty() : StreamSupport.stream(iterable.spliterator(), false);
     }
 
@@ -379,7 +402,7 @@ public final class StreamUtils {
      * @param nullable The nullable array to convert.
      * @return A stream of zero or more values.
      */
-    public static IntStream stream(int [] nullable) {
+    public static IntStream ofNullable(int[] nullable) {
         return null == nullable ? IntStream.empty() : Arrays.stream(nullable);
     }
 
@@ -388,7 +411,7 @@ public final class StreamUtils {
      * @param nullable The nullable array to convert.
      * @return A stream of zero or more values.
      */
-    public static LongStream stream(long [] nullable) {
+    public static LongStream ofNullable(long[] nullable) {
         return null == nullable ? LongStream.empty() : Arrays.stream(nullable);
     }
 
@@ -397,7 +420,7 @@ public final class StreamUtils {
      * @param nullable The nullable array to convert.
      * @return A stream of zero or more values.
      */
-    public static DoubleStream stream(double [] nullable) {
+    public static DoubleStream ofNullable(double[] nullable) {
         return null == nullable ? DoubleStream.empty() : Arrays.stream(nullable);
     }
 
@@ -407,7 +430,7 @@ public final class StreamUtils {
      * @param <T> The type of the value.
      * @return A stream of zero or more values.
      */
-    public static <T> Stream<T> stream(T [] nullable) {
+    public static <T> Stream<T> ofNullable(T[] nullable) {
         return null == nullable ? Stream.empty() : Stream.of(nullable);
     }
 
