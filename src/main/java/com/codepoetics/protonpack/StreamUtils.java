@@ -4,9 +4,7 @@ import com.codepoetics.protonpack.functions.TriFunction;
 
 import java.util.*;
 import java.util.function.*;
-import java.util.stream.LongStream;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
+import java.util.stream.*;
 
 /**
  * Utility class providing static methods for performing various operations on Streams.
@@ -318,7 +316,7 @@ public final class StreamUtils {
      * @return Stream of List&lt;T&gt; aggregated according to predicate
      */
     public static <T> Stream<List<T>> aggregate(Stream<T> source, BiPredicate<T, T> predicate) {
-        return StreamSupport.stream(new AggregatingSpliterator<T>(source.spliterator(), 
+        return StreamSupport.stream(new AggregatingSpliterator<T>(source.spliterator(),
                 (a, e) -> a.isEmpty() || predicate.test(a.get(a.size() - 1), e)), false);
     }
 
@@ -373,6 +371,44 @@ public final class StreamUtils {
      * @return Stream of the values returned by the iterable
      */
     public static <T> Stream<T> stream(Iterable<T> iterable) {
-        return StreamSupport.stream(iterable.spliterator(), false);
+        return null == iterable ? Stream.empty() : StreamSupport.stream(iterable.spliterator(), false);
     }
+
+    /**
+     * Converts nullable int array into an empty stream, and non-null array into a stream.
+     * @param nullable The nullable array to convert.
+     * @return A stream of zero or more values.
+     */
+    public static IntStream stream(int [] nullable) {
+        return null == nullable ? IntStream.empty() : Arrays.stream(nullable);
+    }
+
+    /**
+     * Converts nullable long array into an empty stream, and non-null array into a stream.
+     * @param nullable The nullable array to convert.
+     * @return A stream of zero or more values.
+     */
+    public static LongStream stream(long [] nullable) {
+        return null == nullable ? LongStream.empty() : Arrays.stream(nullable);
+    }
+
+    /**
+     * Converts nullable float array into an empty stream, and non-null array into a stream.
+     * @param nullable The nullable array to convert.
+     * @return A stream of zero or more values.
+     */
+    public static DoubleStream stream(double [] nullable) {
+        return null == nullable ? DoubleStream.empty() : Arrays.stream(nullable);
+    }
+
+    /**
+     * Converts nullable array into an empty stream, and non-null array into a stream.
+     * @param nullable The nullable array to convert.
+     * @param <T> The type of the value.
+     * @return A stream of zero or more values.
+     */
+    public static <T> Stream<T> stream(T [] nullable) {
+        return null == nullable ? Stream.empty() : Stream.of(nullable);
+    }
+
 }
