@@ -306,10 +306,10 @@ public final class StreamUtils {
     public static <T> Stream<T> reject(Stream<T> source, Predicate<? super T> predicate) {
         return source.filter(predicate.negate());
     }
-    
+
     /**
      * Aggregates items from source stream into list of items while supplied predicate is true when evaluated on previous and current item.
-     * Can by seen as streaming alternative to Collectors.groupingBy when source stream is sorted by key. 
+     * Can by seen as streaming alternative to Collectors.groupingBy when source stream is sorted by key.
      * @param source - source stream
      * @param predicate - predicate specifying boundary between groups of items
      * @param <T> The type over which the stream streams.
@@ -331,7 +331,7 @@ public final class StreamUtils {
         if (size <= 0) throw new IllegalArgumentException("Positive size expected, was: "+size);
         return StreamSupport.stream(new AggregatingSpliterator<T>(source.spliterator(), (a, e) -> a.size() < size), false);
     }
-    
+
     /**
      * Aggregates items from source stream. Similar to @aggregate, but uses different predicate, evaluated on all items aggregated so far
      * and next item from source stream.
@@ -349,10 +349,10 @@ public final class StreamUtils {
      * @param nullable The nullable value to convert.
      * @param <T> The type of the value.
      * @return A stream of zero or one values.
-     * @deprecated use {@link StreamUtils#ofNullableValue(Object)}
+     * @deprecated use {@link StreamUtils#ofSingleNullable(Object)}
      */
     public static <T> Stream<T> streamNullable(T nullable) {
-        return ofNullableValue(nullable);
+        return ofSingleNullable(nullable);
     }
 
     // can't be named ofNullable() due to overloading difficulty with erasure of generic type
@@ -362,7 +362,7 @@ public final class StreamUtils {
      * @param <T> The type of the value.
      * @return A stream of zero or one values.
      */
-    public static <T> Stream<T> ofNullableValue(T nullable) {
+    public static <T> Stream<T> ofSingleNullable(T nullable) {
         return null == nullable ? Stream.empty() : Stream.of(nullable);
     }
 
@@ -381,20 +381,19 @@ public final class StreamUtils {
      * @param iterable The iterable to stream.
      * @param <T> The type of the iterable
      * @return Stream of the values returned by the iterable
-     * @deprecated use {@link StreamUtils#ofNullable(Iterable)}
      */
     public static <T> Stream<T> stream(Iterable<T> iterable) {
-        return ofNullable(iterable);
+        return StreamSupport.stream(iterable.spliterator(), false);
     }
 
     /**
-     * Converts an Iterable into a Stream.
+     * Converts a nullable Iterable into a Stream.
      * @param iterable The iterable to stream.
      * @param <T> The type of the iterable
-     * @return Stream of the values returned by the iterable
+     * @return Stream of the values returned by the iterable, or an empty stream if the iterable is null
      */
     public static <T> Stream<T> ofNullable(Iterable<T> iterable) {
-        return null == iterable ? Stream.empty() : StreamSupport.stream(iterable.spliterator(), false);
+        return null == iterable ? Stream.empty() : stream(iterable);
     }
 
     /**

@@ -79,7 +79,7 @@ public interface Streamable<T> extends Supplier<Stream<T>> {
      */
     @SafeVarargs
     static <T> Streamable<T> ofAll(Streamable<T>...streamables) {
-        return Stream.of(streamables).reduce(Streamable::concat).orElseGet(Streamable::empty);
+        return () -> Stream.of(streamables).flatMap(Streamable::stream);
     }
 
     /**
