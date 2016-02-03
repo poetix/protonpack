@@ -4,9 +4,7 @@ import com.codepoetics.protonpack.functions.TriFunction;
 
 import java.util.*;
 import java.util.function.*;
-import java.util.stream.LongStream;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
+import java.util.stream.*;
 
 /**
  * Utility class providing static methods for performing various operations on Streams.
@@ -318,7 +316,7 @@ public final class StreamUtils {
      * @return Stream of List&lt;T&gt; aggregated according to predicate
      */
     public static <T> Stream<List<T>> aggregate(Stream<T> source, BiPredicate<T, T> predicate) {
-        return StreamSupport.stream(new AggregatingSpliterator<T>(source.spliterator(), 
+        return StreamSupport.stream(new AggregatingSpliterator<T>(source.spliterator(),
                 (a, e) -> a.isEmpty() || predicate.test(a.get(a.size() - 1), e)), false);
     }
 
@@ -351,8 +349,20 @@ public final class StreamUtils {
      * @param nullable The nullable value to convert.
      * @param <T> The type of the value.
      * @return A stream of zero or one values.
+     * @deprecated use {@link StreamUtils#ofNullableValue(Object)}
      */
     public static <T> Stream<T> streamNullable(T nullable) {
+        return ofNullableValue(nullable);
+    }
+
+    // can't be named ofNullable() due to overloading difficulty with erasure of generic type
+    /**
+     * Converts nulls into an empty stream, and non-null values into a stream with one element.
+     * @param nullable The nullable value to convert.
+     * @param <T> The type of the value.
+     * @return A stream of zero or one values.
+     */
+    public static <T> Stream<T> ofNullableValue(T nullable) {
         return null == nullable ? Stream.empty() : Stream.of(nullable);
     }
 
@@ -371,8 +381,57 @@ public final class StreamUtils {
      * @param iterable The iterable to stream.
      * @param <T> The type of the iterable
      * @return Stream of the values returned by the iterable
+     * @deprecated use {@link StreamUtils#ofNullable(Iterable)}
      */
     public static <T> Stream<T> stream(Iterable<T> iterable) {
-        return StreamSupport.stream(iterable.spliterator(), false);
+        return ofNullable(iterable);
     }
+
+    /**
+     * Converts an Iterable into a Stream.
+     * @param iterable The iterable to stream.
+     * @param <T> The type of the iterable
+     * @return Stream of the values returned by the iterable
+     */
+    public static <T> Stream<T> ofNullable(Iterable<T> iterable) {
+        return null == iterable ? Stream.empty() : StreamSupport.stream(iterable.spliterator(), false);
+    }
+
+    /**
+     * Converts nullable int array into an empty stream, and non-null array into a stream.
+     * @param nullable The nullable array to convert.
+     * @return A stream of zero or more values.
+     */
+    public static IntStream ofNullable(int[] nullable) {
+        return null == nullable ? IntStream.empty() : Arrays.stream(nullable);
+    }
+
+    /**
+     * Converts nullable long array into an empty stream, and non-null array into a stream.
+     * @param nullable The nullable array to convert.
+     * @return A stream of zero or more values.
+     */
+    public static LongStream ofNullable(long[] nullable) {
+        return null == nullable ? LongStream.empty() : Arrays.stream(nullable);
+    }
+
+    /**
+     * Converts nullable float array into an empty stream, and non-null array into a stream.
+     * @param nullable The nullable array to convert.
+     * @return A stream of zero or more values.
+     */
+    public static DoubleStream ofNullable(double[] nullable) {
+        return null == nullable ? DoubleStream.empty() : Arrays.stream(nullable);
+    }
+
+    /**
+     * Converts nullable array into an empty stream, and non-null array into a stream.
+     * @param nullable The nullable array to convert.
+     * @param <T> The type of the value.
+     * @return A stream of zero or more values.
+     */
+    public static <T> Stream<T> ofNullable(T[] nullable) {
+        return null == nullable ? Stream.empty() : Stream.of(nullable);
+    }
+
 }

@@ -58,7 +58,7 @@ public interface Streamable<T> extends Supplier<Stream<T>> {
      * @return The streamable.
      */
     static <T> Streamable<T> of(Iterable<T> iterable) {
-        return () -> StreamUtils.stream(iterable);
+        return () -> StreamUtils.ofNullable(iterable);
     }
 
     /**
