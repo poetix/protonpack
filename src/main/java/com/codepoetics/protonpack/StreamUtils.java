@@ -1,6 +1,7 @@
 package com.codepoetics.protonpack;
 
 import com.codepoetics.protonpack.functions.TriFunction;
+
 import java.util.*;
 import java.util.function.*;
 import java.util.stream.*;
