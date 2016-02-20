@@ -1,7 +1,6 @@
 package com.codepoetics.protonpack;
 
 import com.codepoetics.protonpack.functions.TriFunction;
-
 import java.util.*;
 import java.util.function.*;
 import java.util.stream.*;
@@ -70,6 +69,21 @@ public final class StreamUtils {
                 middles.spliterator(),
                 rights.spliterator(),
                 combiner), false);
+    }
+
+    /**
+     * Zip together a list of streams until one of them runs out of values.
+     * Each tuple of values is combined into a single value using the supplied combiner function.
+     * @param streams The streams to zip.
+     * @param combiner The function to combine the values.
+     * @param <T> The type over which the streams stream.
+     * @param <O> The type created by the combiner out of groups of values, over
+     * which the resulting stream streams.
+     * @return A stream of zipped values.
+     */
+    public static <T, O> Stream<O> zip(List<Stream<T>> streams, Function<List<T>, O> combiner) {
+        List<Spliterator<T>> spliterators = streams.stream().map(Stream::spliterator).collect(Collectors.toList());
+        return StreamSupport.stream(ListZippingSpliterator.zipping(spliterators, combiner), false);
     }
 
     private static boolean isSized(int characteristics) {
