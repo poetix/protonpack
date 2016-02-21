@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Spliterator;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import static java.util.function.Predicate.isEqual;
 
 class ListZippingSpliterator<T, O> implements Spliterator<O> {
 
@@ -15,7 +16,6 @@ class ListZippingSpliterator<T, O> implements Spliterator<O> {
 
     private final List<Spliterator<T>> spliterators;
     private final Function<List<T>, O> combiner;
-    private boolean hadNext;
 
     private ListZippingSpliterator(List<Spliterator<T>> spliterators, Function<List<T>, O> combiner) {
         this.spliterators = spliterators;
@@ -24,24 +24,17 @@ class ListZippingSpliterator<T, O> implements Spliterator<O> {
 
     @Override
     public boolean tryAdvance(Consumer<? super O> action) {
-        hadNext = false;
-        Iterator<Spliterator<T>> si = spliterators.iterator();
-        if(si.hasNext()) {
-            tryAdvance(si, new ArrayList<>(spliterators.size()), action);
+        if (spliterators.isEmpty()) {
+            return false;
+        }
+        List<T> acc = new ArrayList<>(spliterators.size());
+        boolean hadNext = spliterators.stream()
+                .map(s -> s.tryAdvance(acc::add))
+                .allMatch(isEqual(Boolean.TRUE));
+        if (hadNext) {
+            action.accept(combiner.apply(acc));
         }
         return hadNext;
-    }
-
-    private void tryAdvance(Iterator<Spliterator<T>> si, List<T> acc, Consumer<? super O> action) {
-        if (si.hasNext()) {
-            si.next().tryAdvance(s -> {
-                acc.add(s);
-                tryAdvance(si, acc, action);
-            });
-        } else {
-            action.accept(combiner.apply(acc));
-            hadNext = true;
-        }
     }
 
     @Override
