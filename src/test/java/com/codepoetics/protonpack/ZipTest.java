@@ -2,12 +2,15 @@ package com.codepoetics.protonpack;
 
 import org.junit.Test;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.empty;
 
 public class ZipTest {
 
@@ -64,4 +67,42 @@ public class ZipTest {
         assertThat(zipped, contains("A is for aggravating Apple", "B is for banausic Banana", "C is for complaisant Carrot"));
     }
 
+    @Test public void
+    zips_a_list_of_streams_of_same_length() {
+        Stream<String> streamA = Stream.of("A", "B", "C");
+        Stream<String> streamB  = Stream.of("Apple", "Banana", "Carrot");
+
+        List<String> zipped = StreamUtils.zip(Arrays.asList(streamA, streamB), l -> l.get(0) + " is for " + l.get(1)).collect(Collectors.toList());
+
+        assertThat(zipped, contains("A is for Apple", "B is for Banana", "C is for Carrot"));
+    }
+
+    @Test public void
+    zips_a_list_of_streams_where_first_stream_is_longer() {
+        Stream<String> streamA = Stream.of("A", "B", "C", "D");
+        Stream<String> streamB  = Stream.of("Apple", "Banana", "Carrot");
+
+        List<String> zipped = StreamUtils.zip(Arrays.asList(streamA, streamB), l -> l.get(0) + " is for " + l.get(1)).collect(Collectors.toList());
+
+        assertThat(zipped, contains("A is for Apple", "B is for Banana", "C is for Carrot"));
+    }
+
+    @Test public void
+    zips_a_list_of_streams_where_second_stream_is_longer() {
+        Stream<String> streamA = Stream.of("A", "B", "C");
+        Stream<String> streamB  = Stream.of("Apple", "Banana", "Carrot", "Doughnut");
+
+        List<String> zipped = StreamUtils.zip(Arrays.asList(streamA, streamB), l -> l.get(0) + " is for " + l.get(1)).collect(Collectors.toList());
+
+        assertThat(zipped, contains("A is for Apple", "B is for Banana", "C is for Carrot"));
+    }
+
+    @Test public void
+    zips_an_empty_list_of_streams_without_calling_combiner() {
+        List<String> zipped = StreamUtils.zip(Arrays.asList(),
+                l -> {if (true) throw new AssertionError(); else return ".";})
+                .collect(Collectors.toList());
+
+        assertThat(zipped, is(empty()));
+    }
 }
