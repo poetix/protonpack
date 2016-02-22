@@ -225,7 +225,7 @@ public final class StreamUtils {
     }
 
     /**
-     * Constructs a stream that represents grouped run using the default comparator. This means
+     * Constructs a stream that represents grouped run using the custom comparator. This means
      * that similar elements will get grouped into a list. I.e. given a list of [1,1,2,3,4,4]
      * you will get a stream of ([1,1], [2], [3], [4, 4])
      *
