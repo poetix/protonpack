@@ -10,6 +10,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.BiFunction;
 import java.util.function.BinaryOperator;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -170,6 +171,10 @@ public interface MapStream<K, V> extends Stream<Entry<K, V>> {
      */
     default <K1, V1> MapStream<K1, V1> mapEntries(Function<? super K, ? extends K1> keyMapper, Function<? super V, ? extends V1> valueMapper) {
         return new DefaultMapStream<>(map(e -> new SimpleImmutableEntry<>(keyMapper.apply(e.getKey()), valueMapper.apply(e.getValue()))));
+    }
+
+    default <K, V, R> Stream<R> mapEntries(BiFunction<? super K, ? super V, ? extends R> mapper) {
+        return map(e -> mapper.apply((K)e.getKey(), (V)e.getValue()));
     }
     
     /**
