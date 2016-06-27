@@ -172,7 +172,13 @@ public interface MapStream<K, V> extends Stream<Entry<K, V>> {
     default <K1, V1> MapStream<K1, V1> mapEntries(Function<? super K, ? extends K1> keyMapper, Function<? super V, ? extends V1> valueMapper) {
         return new DefaultMapStream<>(map(e -> new SimpleImmutableEntry<>(keyMapper.apply(e.getKey()), valueMapper.apply(e.getValue()))));
     }
-
+    
+    /**
+     * Applies the mapping for each (key, value) pair in the map.
+     * @param mapper the mapping function to be applied
+     * @param <R> the type to map the (key, value) pairs into
+     * @return a new Stream
+     */
     default <R> Stream<R> mapEntries(BiFunction<? super K, ? super V, ? extends R> mapper) {
         return map(e -> mapper.apply(e.getKey(), e.getValue()));
     }
