@@ -5,8 +5,12 @@
 
 package com.codepoetics.protonpack;
 
+import static java.util.stream.Collectors.toList;
+
+import static org.hamcrest.Matchers.contains;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertThat;
 
 import java.util.Arrays;
 import java.util.List;
@@ -43,6 +47,12 @@ public class MapStreamTest {
         Map<String, Integer> map = mapStream.mapEntries(x -> x.concat(" Doe"), i -> i%2).collect();
         assertEquals(Integer.valueOf(1), map.get("John Doe"));
         assertEquals(Integer.valueOf(0), map.get("Alice Doe"));
+    }
+    
+    @Test
+    public void testMapEntriesWithBiFunction() {
+        List<String> list = mapStream.mapEntries((k, v) -> k + " " + v).collect(toList());
+        assertThat(list, contains("John 1", "Alice 2"));
     }
     
     @Test(expected = IllegalStateException.class)
