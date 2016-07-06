@@ -1,6 +1,7 @@
 protonpack
 ==========
 
+[![Maven Central](https://img.shields.io/maven-central/v/com.codepoetics/protonpack.svg)](http://search.maven.org/#search%7Cga%7C1%7Cprotonpack)
 [![Build Status](https://travis-ci.org/poetix/protonpack.svg?branch=master)](https://travis-ci.org/poetix/protonpack)
 
 A small collection of ```Stream``` utilities for Java 8. Protonpack provides the following:
@@ -22,7 +23,7 @@ Available from Maven Central:
 <dependency>
     <groupId>com.codepoetics</groupId>
     <artifactId>protonpack</artifactId>
-    <version>1.8</version>
+    <version>1.9</version>
 </dependency>
 ```
 
