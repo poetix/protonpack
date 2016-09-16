@@ -14,6 +14,7 @@ class AggregatingSpliterator<I> implements Spliterator<List<I>> {
 
     private final Spliterator<I> source;
     private final BiPredicate<List<I>, I> condition;
+    private boolean wasSameSlide = false;
 
     private List<I> currentSlide = new ArrayList<>();
 
@@ -24,14 +25,19 @@ class AggregatingSpliterator<I> implements Spliterator<List<I>> {
 
     @Override
     public boolean tryAdvance(Consumer<? super List<I>> action) {
-        boolean hadElements = source.tryAdvance(curElem -> {
-                if(!isSameSlide(curElem)) {
-                    action.accept(currentSlide);
-                    currentSlide = new ArrayList<>();
-                }
-                currentSlide.add(curElem);
-            }
-        );
+        boolean hadElements;
+        do {
+            hadElements = source.tryAdvance(curElem -> {
+                        wasSameSlide = isSameSlide(curElem);
+                        if(!wasSameSlide) {
+                            action.accept(currentSlide);
+                            currentSlide = new ArrayList<>();
+                        }
+                        currentSlide.add(curElem);
+                    }
+            );
+        } while (wasSameSlide && hadElements);
+
         if (!hadElements && !currentSlide.isEmpty()) {
             action.accept(currentSlide);
             currentSlide = new ArrayList<>();

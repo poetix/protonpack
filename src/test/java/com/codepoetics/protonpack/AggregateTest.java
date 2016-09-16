@@ -2,6 +2,7 @@ package com.codepoetics.protonpack;
 
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -52,5 +53,28 @@ public class AggregateTest {
         Stream<String> stream = Stream.of("a1");
         Stream<List<String>> aggregated = StreamUtils.aggregate(stream, 2);
         assertThat(aggregated.findFirst().get(), equalTo(asList("a1")));
+    }
+
+    @Test public void
+    works_with_iterator() throws Exception {
+        Stream<String> stream = Stream.of("a", "a", "a", "b", "b", "c", "c", "c");
+        Stream<List<String>> aggregated = StreamUtils.aggregate(stream, (a, b) -> a.equals(b));
+        List<List<String>> list = new ArrayList<>();
+        aggregated.iterator().forEachRemaining(list::add);
+        assertThat(list, contains(
+                asList("a", "a", "a"),
+                asList("b", "b"),
+                asList("c", "c", "c")
+        ));
+
+        stream = Stream.of("a", "a", "a", "b", "b", "c", "c", "c");
+        aggregated = StreamUtils.aggregate(stream, 3);
+        list = new ArrayList<>();
+        aggregated.iterator().forEachRemaining(list::add);
+        assertThat(list, contains(
+                asList("a", "a", "a"),
+                asList("b", "b", "c"),
+                asList("c", "c")
+        ));
     }
 }
