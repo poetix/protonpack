@@ -294,6 +294,17 @@ public final class StreamUtils {
         return StreamSupport.stream(MergingSpliterator.merging(spliterators, unitSupplier, merger), false);
     }
 
+    public static <T extends Comparable<T>, O extends Comparable<O>> Stream<O> join(Stream<T> left, Stream<T> right, BiFunction<T,T,O> merger) {
+        return StreamSupport.stream(
+                new JoinSpliterator<T, O>(
+                        (l, r) -> l.compareTo(r),
+                        left.spliterator(),
+                        right.spliterator(),
+                        merger
+                ), false
+        );
+    }
+
     /**
      * Construct a stream which merges together values from the supplied streams into lists of values, somewhat in the manner of the
      * stream constructed by {@link com.codepoetics.protonpack.StreamUtils#zip(java.util.stream.Stream, java.util.stream.Stream, java.util.function.BiFunction)},
