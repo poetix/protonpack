@@ -8,13 +8,10 @@ import static java.util.stream.Collectors.toList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 
-/**
- * Created by hadrien on 17/09/16.
- */
 public class JoinSpliteratorTest {
 
-    @Test
-    public void test_join() throws Exception {
+    @Test public void
+    test_join() throws Exception {
 
         Stream<Integer> a = Stream.of(1, 2, 3, 4, 5, 6, 7, 8, 9);
         Stream<Integer> b = Stream.of(1, 2, 3, 4, 5, 6, 7, 8, 9);
@@ -25,8 +22,20 @@ public class JoinSpliteratorTest {
         ));
     }
 
-    @Test
-    public void test_skip_left() throws Exception {
+    @Test public void
+    test_join_custom_sort() throws Exception {
+
+        Stream<Integer> a = Stream.of(1, 2, 3, 4, 5, 6, 7, 8, 9);
+        Stream<Integer> b = Stream.of(1, 2, 3, 4, 5, 6, 7, 8, 9);
+
+        Stream<Integer> joined = StreamUtils.join(a, b, (l, r) -> l * r, (l, r) -> r - l);
+        assertThat(joined.collect(toList()), contains(
+                81, 64, 49, 36, 25, 16, 9 ,4, 1
+        ));
+    }
+
+    @Test public void
+    test_skip_left() throws Exception {
 
         Stream<Integer> a = Stream.of(1, 2, 3, 4, 5, 6, 7, 8, 9);
         Stream<Integer> b = Stream.of(5, 6, 7, 8, 9, 10, 11, 12);
@@ -37,8 +46,8 @@ public class JoinSpliteratorTest {
         ));
     }
 
-    @Test
-    public void test_skip_right() throws Exception {
+    @Test public void
+    test_skip_right() throws Exception {
 
         Stream<Integer> a = Stream.of(5, 6, 7, 8, 9, 10, 11, 12);
         Stream<Integer> b = Stream.of(1, 2, 3, 4, 5, 6, 7, 8, 9);

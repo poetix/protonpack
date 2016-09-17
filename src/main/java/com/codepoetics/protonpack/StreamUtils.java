@@ -294,12 +294,23 @@ public final class StreamUtils {
         return StreamSupport.stream(MergingSpliterator.merging(spliterators, unitSupplier, merger), false);
     }
 
-    public static <T extends Comparable<T>, O extends Comparable<O>> Stream<O> join(Stream<T> left, Stream<T> right, BiFunction<T,T,O> merger) {
+    public static <T extends Comparable<T>, O extends Comparable<O>> Stream<O> join(Stream<T> left, Stream<T> right, BiFunction<T ,T ,O> merger) {
         return StreamSupport.stream(
-                new JoinSpliterator<T, O>(
-                        (l, r) -> l.compareTo(r),
-                        left.spliterator(),
-                        right.spliterator(),
+                new JoinSpliterator<>(
+                        Comparable::compareTo,
+                        left.sorted().spliterator(),
+                        right.sorted().spliterator(),
+                        merger
+                ), false
+        );
+    }
+
+    public static <T, O> Stream<O> join(Stream<T> left, Stream<T> right, BiFunction< T, T, O> merger, Comparator<T> comparator) {
+        return StreamSupport.stream(
+                new JoinSpliterator<>(
+                        comparator,
+                        left.sorted(comparator).spliterator(),
+                        right.sorted(comparator).spliterator(),
                         merger
                 ), false
         );

@@ -5,7 +5,7 @@ import java.util.Spliterator;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
-public class JoinSpliterator<I extends Comparable<I>, O extends Comparable<O>> implements Spliterator<O> {
+public class JoinSpliterator<I, O> implements Spliterator<O> {
 
     final private Comparator<I> comparator;
     final private Spliterator<I> left;
