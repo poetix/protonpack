@@ -111,3 +111,17 @@ assertThat(Stream.of(1, 2, 3).filter(i -> i > 2).collect(CollectorUtils.unique()
 // Throws NonUniqueValueException
 Stream.of(1, 2, 3).filter(i -> i > 1).collect(CollectorUtils.unique());
 ```
+
+## toFutureList
+
+A collector that converts a stream of `CompletableFuture<T>` into a `CompletableFuture<List<T>>`, which completes
+exceptionally if (and as soon as) any of the futures in the list completes exceptionally.
+
+```java
+Function<Integer, CompletableFuture<Integer>> processAsynchronously = i -> CompletableFuture.completedFuture(i * 2);
+assertThat(
+        Stream.of(1, 2, 3).map(processAsynchronously)
+                .collect(CompletableFutures.toFutureList())
+                .get(),
+        contains(2, 4, 6));
+```

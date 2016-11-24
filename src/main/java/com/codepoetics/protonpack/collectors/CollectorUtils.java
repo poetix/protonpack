@@ -6,6 +6,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 /**
  * Utility class providing some collectors.
@@ -37,7 +38,7 @@ public final class CollectorUtils {
      */
     public static <T, Y> Collector<T, ?, Optional<T>>
     maxBy(Function<T, Y> projection, Comparator<Y> comparator) {
-        return java.util.stream.Collectors.maxBy((a, b) -> {
+        return Collectors.maxBy((a, b) -> {
             Y element1 = projection.apply(a);
             Y element2 = projection.apply(b);
 
@@ -67,7 +68,7 @@ public final class CollectorUtils {
      */
     public static <T, Y> Collector<T, ?, Optional<T>>
     minBy(Function<T, Y> projection, Comparator<Y> comparator) {
-        return java.util.stream.Collectors.minBy((a, b) -> {
+        return Collectors.minBy((a, b) -> {
             Y element1 = projection.apply(a);
             Y element2 = projection.apply(b);
 
@@ -107,13 +108,13 @@ public final class CollectorUtils {
 
     /**
      * A combiner for all the cases when you don't intend to reduce/collect on a parallel stream.
-     * Will throw an {@link java.lang.IllegalStateException} if it is ever called.
+     * Will throw an {@link java.lang.UnsupportedOperationException} if it is ever called.
      * @param <T> The type of partial result you don't intend to combine.
      * @return A combiner that throws an exception instead of combining.
      */
     public static <T> BinaryOperator<T> noCombiner() {
         return (t1, t2) -> {
-            throw new IllegalStateException("No combiner supplied for merging parallel results");
+            throw new UnsupportedOperationException("No combiner supplied for merging parallel results");
         };
     }
 }
