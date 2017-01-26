@@ -10,7 +10,7 @@
 
     <groupId>com.codepoetics</groupId>
     <artifactId>protonpack</artifactId>
-    <version>1.12-SNAPSHOT</version>
+    <version>thecolourofmagic</version>
     <packaging>bundle</packaging>
     
     <dependencies>
