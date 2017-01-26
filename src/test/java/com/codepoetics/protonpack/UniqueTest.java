@@ -22,6 +22,11 @@ public class UniqueTest {
         assertThat(Stream.of(1, 2, 3).filter(i -> i > 2).collect(CollectorUtils.unique()), equalTo(Optional.of(3)));
     }
 
+    @Test public void
+    returns_unique_nullable_item(){
+        assertThat(Stream.of(1, 2, 3).filter(i -> i > 2).collect(CollectorUtils.uniqueNullable()), equalTo(3));
+    }
+
     @Test(expected=NonUniqueValueException.class) public void
     throws_exception_if_item_is_not_unique() {
         Stream.of(1, 2, 3).filter(i -> i > 1).collect(CollectorUtils.unique());

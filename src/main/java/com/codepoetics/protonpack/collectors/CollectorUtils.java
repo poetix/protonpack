@@ -92,6 +92,22 @@ public final class CollectorUtils {
         );
     }
 
+    /**
+     * A collector that returns the single member of a stream (or null if not present), or throws a
+     * {@link com.codepoetics.protonpack.collectors.NonUniqueValueException} if more
+     * than one item is found.
+     * @param <T> The type of the items in the stream.
+     * @return The collector.
+     */
+    public static <T> Collector<T, AtomicReference<T>, T> uniqueNullable() {
+        return Collector.of(
+                AtomicReference::new,
+                CollectorUtils::uniqueAccumulate,
+                CollectorUtils::uniqueCombine,
+                AtomicReference::get
+        );
+    }
+
     private static <T> void uniqueAccumulate(AtomicReference<T> a, T t) {
         if (t == null) {
             return;
