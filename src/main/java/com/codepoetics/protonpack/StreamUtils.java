@@ -152,6 +152,18 @@ public final class StreamUtils {
     }
 
     /**
+     * Construct a stream which skips values from the source stream up until but including the first value is found that
+     * does not meet the given condition.
+     * @param source The source stream.
+     * @param condition The condition to apply to elements of the source stream.
+     * @param <T> The type over which the stream streams.
+     * @return An element-skipping stream.
+     */
+    public static <T> Stream<T> skipWhileInclusive(Stream<T> source, Predicate<T> condition) {
+        return StreamSupport.stream(SkipUntilSpliterator.overInclusive(source.spliterator(), condition.negate()), false);
+    }
+
+    /**
      * Construct a stream which skips values from the source stream for as long as they do not meet the supplied condition,
      * then streams every remaining value as soon as the first value is found which does meet the condition.
      * @param source The source stream.
@@ -161,6 +173,18 @@ public final class StreamUtils {
      */
     public static <T> Stream<T> skipUntil(Stream<T> source, Predicate<T> condition) {
         return StreamSupport.stream(SkipUntilSpliterator.over(source.spliterator(), condition), false);
+    }
+
+    /**
+     * Construct a stream which skips values from the source stream up until but including the first value is found that
+     * satisfies the given condition.
+     * @param source The source stream.
+     * @param condition The condition to apply to elements of the source stream.
+     * @param <T> The type over which the stream streams.
+     * @return An element-skipping stream.
+     */
+    public static <T> Stream<T> skipUntilInclusive(Stream<T> source, Predicate<T> condition) {
+        return StreamSupport.stream(SkipUntilSpliterator.overInclusive(source.spliterator(), condition), false);
     }
 
     /**

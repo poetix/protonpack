@@ -22,6 +22,16 @@ public class SkipWhileTest {
     }
 
     @Test public void
+    skip_while_inclusive_skips_items_while_condition_is_met_but_includes_first_condition_breaker() {
+        Stream<Integer> ints = Stream.of(1,2,3,4,5,6,7,8,9,10);
+        Stream<Integer> skipped = StreamUtils.skipWhileInclusive(ints, i -> i < 4);
+
+        List<Integer> collected = skipped.collect(Collectors.toList());
+
+        assertThat(collected, contains(5, 6, 7, 8, 9, 10));
+    }
+
+    @Test public void
     skip_until_takes_items_until_condition_is_met() {
         Stream<Integer> ints = Stream.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
         Stream<Integer> skipped = StreamUtils.skipUntil(ints, i -> i > 4);
@@ -29,6 +39,16 @@ public class SkipWhileTest {
         List<Integer> collected = skipped.collect(Collectors.toList());
 
         assertThat(collected, contains(5, 6, 7, 8, 9, 10));
+    }
+
+    @Test public void
+    skip_until_inclusive_skips_items_until_condition_is_met_but_includes_first_condition_meeter() {
+        Stream<Integer> ints = Stream.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+        Stream<Integer> skipped = StreamUtils.skipUntilInclusive(ints, i -> i > 4);
+
+        List<Integer> collected = skipped.collect(Collectors.toList());
+
+        assertThat(collected, contains(6, 7, 8, 9, 10));
     }
 
     @Test public void

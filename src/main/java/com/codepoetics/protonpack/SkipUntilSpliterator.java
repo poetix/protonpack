@@ -8,16 +8,22 @@ import java.util.function.Predicate;
 class SkipUntilSpliterator<T> implements Spliterator<T>  {
 
     static <T> SkipUntilSpliterator<T> over(Spliterator<T> source, Predicate<T> condition) {
-        return new SkipUntilSpliterator<>(source, condition);
+        return new SkipUntilSpliterator<>(source, condition, false);
+    }
+
+    static <T> SkipUntilSpliterator<T> overInclusive(Spliterator<T> source, Predicate<T> condition) {
+        return new SkipUntilSpliterator<>(source, condition, true);
     }
 
     private final Spliterator<T> source;
     private final Predicate<T> condition;
+    private final boolean inclusive;
     private boolean conditionMet = false;
 
-    private SkipUntilSpliterator(Spliterator<T> source, Predicate<T> condition) {
+    private SkipUntilSpliterator(Spliterator<T> source, Predicate<T> condition, boolean inclusive) {
         this.source = source;
         this.condition = condition;
+        this.inclusive = inclusive;
     }
 
     @Override
@@ -26,8 +32,11 @@ class SkipUntilSpliterator<T> implements Spliterator<T>  {
             return source.tryAdvance(action);
         }
         while (!conditionMet && source.tryAdvance(e -> {
-            if (conditionMet = condition.test(e)) {
-                action.accept(e);
+            if (condition.test(e)) {
+                if (!inclusive) {
+                    action.accept(e);
+                }
+                conditionMet = true;
             }
         }));
         return conditionMet;
