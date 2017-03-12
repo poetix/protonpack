@@ -8,24 +8,35 @@ import java.util.function.Predicate;
 class TakeWhileSpliterator<T> implements Spliterator<T> {
 
     static <T> TakeWhileSpliterator<T> over(Spliterator<T> source, Predicate<T> condition) {
-        return new TakeWhileSpliterator<>(source, condition);
+        return new TakeWhileSpliterator<>(source, condition, false);
+    }
+
+    static <T> TakeWhileSpliterator<T> overInclusive(Spliterator<T> source, Predicate<T> condition) {
+        return new TakeWhileSpliterator<>(source, condition, true);
     }
 
     private final Spliterator<T> source;
     private final Predicate<T> condition;
-    private boolean conditionHolds = true;
+    private final boolean inclusive;
+    private boolean conditionHeldSoFar = true;
 
-    private TakeWhileSpliterator(Spliterator<T> source, Predicate<T> condition) {
+    private TakeWhileSpliterator(Spliterator<T> source, Predicate<T> condition, boolean inclusive) {
         this.source = source;
         this.condition = condition;
+        this.inclusive = inclusive;
     }
 
 
     @Override
     public boolean tryAdvance(Consumer<? super T> action) {
-        return conditionHolds && source.tryAdvance(e -> {
-            if (conditionHolds = condition.test(e)) {
+        return conditionHeldSoFar && source.tryAdvance(e -> {
+            if (condition.test(e)) {
                 action.accept(e);
+            } else {
+                if (inclusive && conditionHeldSoFar) {
+                    action.accept(e);
+                }
+                conditionHeldSoFar = false;
             }
         });
     }
@@ -37,7 +48,7 @@ class TakeWhileSpliterator<T> implements Spliterator<T> {
 
     @Override
     public long estimateSize() {
-        return conditionHolds ? source.estimateSize() : 0;
+        return conditionHeldSoFar ? source.estimateSize() : 0;
     }
 
     @Override

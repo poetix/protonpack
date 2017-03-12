@@ -104,6 +104,18 @@ public final class StreamUtils {
     }
 
     /**
+     * Construct a stream which takes values from the source stream until but including the first value that is
+     * encountered which does not meet the condition.
+     * @param source The source stream.
+     * @param condition The condition to apply to elements of the source stream.
+     * @param <T> The type over which the stream streams.
+     * @return A condition-bounded stream.
+     */
+    public static <T> Stream<T> takeWhileInclusive(Stream<T> source, Predicate<T> condition) {
+        return StreamSupport.stream(TakeWhileSpliterator.overInclusive(source.spliterator(), condition), false);
+    }
+
+    /**
      * Construct a stream which takes values from the source stream until one of them meets the supplied condition,
      * and then stops.
      * @param source The source stream.
@@ -113,6 +125,18 @@ public final class StreamUtils {
      */
     public static <T> Stream<T> takeUntil(Stream<T> source, Predicate<T> condition) {
         return takeWhile(source, condition.negate());
+    }
+
+    /**
+     * Construct a stream which takes values from the source stream until but including the first value that is
+     * encountered which meets the supplied condition.
+     * @param source The source stream.
+     * @param condition The condition to apply to elements of the source stream.
+     * @param <T> The type over which the stream streams.
+     * @return A condition-bounded stream.
+     */
+    public static <T> Stream<T> takeUntilInclusive(Stream<T> source, Predicate<T> condition) {
+        return takeWhileInclusive(source, condition.negate());
     }
 
     /**
