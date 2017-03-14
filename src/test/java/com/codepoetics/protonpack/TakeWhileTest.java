@@ -19,10 +19,27 @@ public class TakeWhileTest {
     }
 
     @Test public void
+    take_while_inclusive_takes_items_while_condition_is_met_but_includes_first_condition_breaker() {
+        Stream<Integer> infiniteInts = Stream.iterate(0, i -> i + 1);
+        Stream<Integer> finiteInts = StreamUtils.takeWhileInclusive(infiniteInts, i -> i < 10);
+
+        assertThat(finiteInts.collect(Collectors.toList()), hasSize(11));
+    }
+
+    @Test public void
     take_until_takes_items_until_condition_is_met() {
         Stream<Integer> infiniteInts = Stream.iterate(0, i -> i + 1);
         Stream<Integer> finiteInts = StreamUtils.takeUntil(infiniteInts, i -> i > 10);
 
         assertThat(finiteInts.collect(Collectors.toList()), hasSize(11));
     }
+
+    @Test public void
+    take_until_inclusive_takes_items_until_condition_is_met_but_includes_first_condition_meeter() {
+        Stream<Integer> infiniteInts = Stream.iterate(0, i -> i + 1);
+        Stream<Integer> finiteInts = StreamUtils.takeUntilInclusive(infiniteInts, i -> i > 10);
+
+        assertThat(finiteInts.collect(Collectors.toList()), hasSize(12));
+    }
+
 }
