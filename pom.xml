@@ -10,7 +10,7 @@
 
     <groupId>com.codepoetics</groupId>
     <artifactId>protonpack</artifactId>
-    <version>1.13</version>
+    <version>1.14-SNAPSHOT</version>
     <packaging>bundle</packaging>
     
     <dependencies>
