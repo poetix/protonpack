@@ -23,7 +23,7 @@ Available from Maven Central:
 <dependency>
     <groupId>com.codepoetics</groupId>
     <artifactId>protonpack</artifactId>
-    <version>1.9</version>
+    <version>1.13</version>
 </dependency>
 ```
 
