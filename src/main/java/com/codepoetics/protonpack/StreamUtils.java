@@ -47,7 +47,8 @@ public final class StreamUtils {
      * @return A stream of zipped values.
      */
     public static <L, R, O> Stream<O> zip(Stream<L> lefts, Stream<R> rights, BiFunction<L, R, O> combiner) {
-        return StreamSupport.stream(ZippingSpliterator.zipping(lefts.spliterator(), rights.spliterator(), combiner), false);
+    	boolean isParallel = lefts.isParallel() && rights.isParallel();
+        return StreamSupport.stream(ZippingSpliterator.zipping(lefts.spliterator(), rights.spliterator(), combiner), isParallel);
     }
 
     /**

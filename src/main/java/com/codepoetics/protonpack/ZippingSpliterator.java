@@ -1,6 +1,7 @@
 package com.codepoetics.protonpack;
 
 import java.util.Spliterator;
+import java.util.Spliterators;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
@@ -34,7 +35,15 @@ class ZippingSpliterator<L, R, O> implements Spliterator<O> {
 
     @Override
     public Spliterator<O> trySplit() {
-        return null;
+    	Spliterator<L> newLefts = lefts.trySplit();
+    	if(newLefts == null){
+    		return null;
+    	}
+        Spliterator<R> newRights = rights.trySplit();
+    	if(newRights == null){
+    		return null;
+    	}
+    	return zipping(newLefts, newRights, combiner);
     }
 
     @Override
