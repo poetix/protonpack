@@ -343,6 +343,55 @@ public final class StreamUtils {
     }
 
     /**
+     * Construct a stream which joins together two {@link Stream}s of {@link Comparable}.
+     * <p>
+     * Construct a stream which joins together the supplied streams of comparable. Both streams will be sorted if they
+     * are not, so that the sort-merge-join algorithm can be used.
+     *
+     * @param merger Merges each pair values that match from the source streams into a new value.
+     * @param left   The left stream to join.
+     * @param right  The right stream to join.
+     * @param <T>    The type over which the merged streams stream.
+     * @param <O>    The type of the accumulator, over which the constructed stream streams.
+     * @return A joining stream.
+     */
+    public static <T extends Comparable<T>, O extends Comparable<O>> Stream<O> join(BiFunction<T ,T ,O> merger, Stream<T> left, Stream<T> right) {
+        return StreamSupport.stream(
+                new JoinSpliterator<>(
+                        Comparable::compareTo,
+                        left.sorted().spliterator(),
+                        right.sorted().spliterator(),
+                        merger
+                ), false
+        );
+    }
+
+    /**
+     * Construct a stream which joins together two {@link Stream}s.
+     * <p>
+     * Construct a stream which joins together the supplied streams using the given {@link Comparable<T>}. Both streams
+     * will be sorted if they are not, so that the sort-merge-join algorithm can be used.
+     *
+     * @param left       The left stream to join.
+     * @param right      The right stream to join.
+     * @param merger     Merges each pair values that match from the source streams into a new value.
+     * @param comparator The comparator to use for join equality.
+     * @param <T>        The type over which the merged streams stream.
+     * @param <O>        The type of the accumulator, over which the constructed stream streams.
+     * @return A joining stream.
+     */
+    public static <T, O> Stream<O> join(BiFunction< T, T, O> merger, Comparator<T> comparator, Stream<T> left, Stream<T> right) {
+        return StreamSupport.stream(
+                new JoinSpliterator<>(
+                        comparator,
+                        left.sorted(comparator).spliterator(),
+                        right.sorted(comparator).spliterator(),
+                        merger
+                ), false
+        );
+    }
+
+    /**
      * Construct a stream which merges together values from the supplied streams into lists of values, somewhat in the manner of the
      * stream constructed by {@link com.codepoetics.protonpack.StreamUtils#zip(java.util.stream.Stream, java.util.stream.Stream, java.util.function.BiFunction)},
      * but for an arbitrary number of streams.
