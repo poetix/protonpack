@@ -138,7 +138,7 @@ public interface MapStream<K, V> extends Stream<Entry<K, V>> {
     }   
     
     /**
-     * Applies the mapping for each keys in the map. If your mapping function is not bijective,
+     * Applies the mapping for each key in the map. If your mapping function is not injective,
      * make sure you call {@code mergeKeys} or that you provide a merge function when calling
      * {@code collect}
      * @param mapper - the key mapping to be applied
@@ -150,7 +150,7 @@ public interface MapStream<K, V> extends Stream<Entry<K, V>> {
     }
     
     /**
-     * Applies the mapping for each values in the map. 
+     * Applies the mapping for each value in the map.
      * @param mapper - the value mapping to be applied
      * @param <V1> the type to map the values into
      * @return a new MapStream
@@ -160,8 +160,8 @@ public interface MapStream<K, V> extends Stream<Entry<K, V>> {
     }
     
     /**
-     * Applies the mapping for each keys and values in the map. If your mapping function is not 
-     * bijective for the keys, make sure you call {@code mergeKeys} or that you provide a merge 
+     * Applies the mapping for each key and value in the map. If your mapping function is not
+     * injective for the keys, make sure you call {@code mergeKeys} or that you provide a merge
      * function when calling {@code collect}.
      * @param keyMapper - the key mapping to be applied
      * @param valueMapper - the value mapping to be applied
@@ -220,7 +220,7 @@ public interface MapStream<K, V> extends Stream<Entry<K, V>> {
     }
 
     /**
-     * Return a MapStream from which the key and values are reversed.
+     * Return a MapStream from which the keys and values are reversed.
      * @return a new MapStream
      */
     default MapStream<V, K> inverseMapping() {
