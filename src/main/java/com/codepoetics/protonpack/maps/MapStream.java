@@ -138,7 +138,7 @@ public interface MapStream<K, V> extends Stream<Entry<K, V>> {
     }   
     
     /**
-     * Applies the mapping for each keys in the map. If your mapping function is not bijective,
+     * Applies the mapping for each key in the map. If your mapping function is not injective,
      * make sure you call {@code mergeKeys} or that you provide a merge function when calling
      * {@code collect}
      * @param mapper - the key mapping to be applied
@@ -150,7 +150,7 @@ public interface MapStream<K, V> extends Stream<Entry<K, V>> {
     }
     
     /**
-     * Applies the mapping for each values in the map. 
+     * Applies the mapping for each value in the map.
      * @param mapper - the value mapping to be applied
      * @param <V1> the type to map the values into
      * @return a new MapStream
@@ -160,8 +160,8 @@ public interface MapStream<K, V> extends Stream<Entry<K, V>> {
     }
     
     /**
-     * Applies the mapping for each keys and values in the map. If your mapping function is not 
-     * bijective for the keys, make sure you call {@code mergeKeys} or that you provide a merge 
+     * Applies the mapping for each key and value in the map. If your mapping function is not
+     * injective for the keys, make sure you call {@code mergeKeys} or that you provide a merge
      * function when calling {@code collect}.
      * @param keyMapper - the key mapping to be applied
      * @param valueMapper - the value mapping to be applied
@@ -182,7 +182,30 @@ public interface MapStream<K, V> extends Stream<Entry<K, V>> {
     default <R> Stream<R> mapEntries(BiFunction<? super K, ? super V, ? extends R> mapper) {
         return map(e -> mapper.apply(e.getKey(), e.getValue()));
     }
-    
+
+    /**
+     * Applies the mapping for each key and value in the map, to produce a new key for each
+     * entry. If your mapping function is not injective for the keys, make sure you call {@code
+     * mergeKeys} or that you provide a merge function when calling {@code collect}.
+     * @param mapper the mapping function to be applied
+     * @param <R>    the new key type to map the (key, value) pairs into
+     * @return a new MapStream
+     */
+    default <R> MapStream<R, V> mapEntriesToKeys(BiFunction<? super K, ? super V, ? extends R> mapper) {
+        return new DefaultMapStream<>(map(e -> new SimpleImmutableEntry<>(mapper.apply(e.getKey(), e.getValue()), e.getValue())));
+    }
+
+    /**
+     * Applies the mapping for each key and value in the map, to produce a new value for each
+     * entry.
+     * @param mapper the mapping function to be applied
+     * @param <R>    the new value type to map the (key, value) pairs into
+     * @return a new MapStream
+     */
+    default <R> MapStream<K, R> mapEntriesToValues(BiFunction<? super K, ? super V, ? extends R> mapper) {
+        return new DefaultMapStream<>(map(e -> new SimpleImmutableEntry<>(e.getKey(), mapper.apply(e.getKey(), e.getValue()))));
+    }
+
     /**
      * Merge keys of the Stream into a new Stream 
      * @return a new MapStream
@@ -220,7 +243,7 @@ public interface MapStream<K, V> extends Stream<Entry<K, V>> {
     }
 
     /**
-     * Return a MapStream from which the key and values are reversed.
+     * Return a MapStream from which the keys and values are reversed.
      * @return a new MapStream
      */
     default MapStream<V, K> inverseMapping() {

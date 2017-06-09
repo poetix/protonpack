@@ -13,6 +13,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertThat;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -48,13 +49,28 @@ public class MapStreamTest {
         assertEquals(Integer.valueOf(1), map.get("John Doe"));
         assertEquals(Integer.valueOf(0), map.get("Alice Doe"));
     }
-    
+
     @Test
     public void testMapEntriesWithBiFunction() {
         List<String> list = mapStream.mapEntries((k, v) -> k + " " + v).collect(toList());
         assertThat(list, contains("John 1", "Alice 2"));
     }
-    
+
+    @Test
+    public void testMapEntriesToKeys() {
+        Map<Character, Integer> map = mapStream.mapEntriesToKeys(String::charAt).collect();
+        assertEquals(MapStream.of('o', 1, 'i', 2).collect(), map);
+    }
+
+    @Test
+    public void testMapEntriesToValues() {
+        Map<String, String> map = mapStream.mapEntriesToValues((k, v) -> "Pope "
+                                                                         + k
+                                                                         + " "
+                                                                         + String.join("", Collections.nCopies(v, "I"))).collect();
+        assertEquals(MapStream.of("John", "Pope John I", "Alice", "Pope Alice II").collect(), map);
+    }
+
     @Test(expected = IllegalStateException.class)
     public void testFailMergeKeys() {
        mapStream.mapKeys(x -> Character.isUpperCase(x.charAt(0))).collect();
