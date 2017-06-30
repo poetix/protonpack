@@ -58,4 +58,10 @@ public class Indexed<T> {
         final Indexed other = (Indexed) obj;
         return Objects.equals(index, other.index) && Objects.equals(value, other.value);
     }
+
+    @Override
+    public String toString() {
+        return String.format("Indexed { index: %d, value: %s }", index, value);
+    }
+
 }
