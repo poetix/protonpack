@@ -26,8 +26,8 @@ public class MinMaxByProjectionTest {
     min_by_with_projection_and_default_comparer() {
         Stream<String> integerStream = Stream.of("abc", "bb", "ccc", "1");
 
-        Optional<String> max = integerStream.collect(minBy(String::length));
+        Optional<String> min = integerStream.collect(minBy(String::length));
 
-        assertThat(max.get(), is("1"));
+        assertThat(min.get(), is("1"));
     }
 }
