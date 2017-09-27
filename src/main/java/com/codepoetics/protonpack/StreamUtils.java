@@ -15,6 +15,31 @@ public final class StreamUtils {
 
     }
 
+    protected static Runnable closerFor(Stream... streams) {
+        return closerFor(Arrays.asList(streams));
+    }
+
+
+    private static <T> Runnable closerFor(List<Stream<T>> streams) {
+        return () -> {
+            List<Exception> exceptions = new ArrayList<>();
+            for (Stream stream : streams) {
+                try {
+                    stream.close();
+                } catch (Exception e) {
+                    exceptions.add(e);
+                }
+            }
+            if (!exceptions.isEmpty()) {
+                Exception exception = exceptions.remove(0);
+                for (Exception suppressed : exceptions) {
+                    exception.addSuppressed(suppressed);
+                }
+                throw new RuntimeException(exception);
+            }
+        };
+    }
+
     /**
      * Constructs an infinite (although in practice bounded by Long.MAX_VALUE) stream of longs 0, 1, 2, 3...
      * for use as indices.
@@ -31,7 +56,8 @@ public final class StreamUtils {
      * @return A stream of indexed values.
      */
     public static <T> Stream<Indexed<T>> zipWithIndex(Stream<T> source) {
-        return zip(indices().mapToObj(Long::valueOf), source, Indexed::index);
+        return zip(indices().mapToObj(Long::valueOf), source, Indexed::index)
+                .onClose(source::close);
     }
 
     /**
@@ -47,7 +73,8 @@ public final class StreamUtils {
      * @return A stream of zipped values.
      */
     public static <L, R, O> Stream<O> zip(Stream<L> lefts, Stream<R> rights, BiFunction<L, R, O> combiner) {
-        return StreamSupport.stream(ZippingSpliterator.zipping(lefts.spliterator(), rights.spliterator(), combiner), false);
+        return StreamSupport.stream(ZippingSpliterator.zipping(lefts.spliterator(), rights.spliterator(), combiner), false)
+                .onClose(closerFor(lefts, rights));
     }
 
     /**
@@ -69,7 +96,8 @@ public final class StreamUtils {
                 lefts.spliterator(),
                 middles.spliterator(),
                 rights.spliterator(),
-                combiner), false);
+                combiner), false)
+                .onClose(closerFor(lefts, middles, rights));
     }
 
     /**
@@ -84,7 +112,8 @@ public final class StreamUtils {
      */
     public static <T, O> Stream<O> zip(List<Stream<T>> streams, Function<List<T>, O> combiner) {
         List<Spliterator<T>> spliterators = streams.stream().map(Stream::spliterator).collect(Collectors.toList());
-        return StreamSupport.stream(ListZippingSpliterator.zipping(spliterators, combiner), false);
+        return StreamSupport.stream(ListZippingSpliterator.zipping(spliterators, combiner), false)
+                .onClose(closerFor(streams));
     }
 
     private static boolean isSized(int characteristics) {
@@ -100,7 +129,8 @@ public final class StreamUtils {
      * @return A condition-bounded stream.
      */
     public static <T> Stream<T> takeWhile(Stream<T> source, Predicate<T> condition) {
-        return StreamSupport.stream(TakeWhileSpliterator.over(source.spliterator(), condition), false);
+        return StreamSupport.stream(TakeWhileSpliterator.over(source.spliterator(), condition), false)
+                .onClose(source::close);
     }
 
     /**
@@ -112,7 +142,8 @@ public final class StreamUtils {
      * @return A condition-bounded stream.
      */
     public static <T> Stream<T> takeWhileInclusive(Stream<T> source, Predicate<T> condition) {
-        return StreamSupport.stream(TakeWhileSpliterator.overInclusive(source.spliterator(), condition), false);
+        return StreamSupport.stream(TakeWhileSpliterator.overInclusive(source.spliterator(), condition), false)
+                .onClose(source::close);
     }
 
     /**
@@ -148,7 +179,8 @@ public final class StreamUtils {
      * @return An element-skipping stream.
      */
     public static <T> Stream<T> skipWhile(Stream<T> source, Predicate<T> condition) {
-        return StreamSupport.stream(SkipUntilSpliterator.over(source.spliterator(), condition.negate()), false);
+        return StreamSupport.stream(SkipUntilSpliterator.over(source.spliterator(), condition.negate()), false)
+                .onClose(source::close);
     }
 
     /**
@@ -160,7 +192,8 @@ public final class StreamUtils {
      * @return An element-skipping stream.
      */
     public static <T> Stream<T> skipWhileInclusive(Stream<T> source, Predicate<T> condition) {
-        return StreamSupport.stream(SkipUntilSpliterator.overInclusive(source.spliterator(), condition.negate()), false);
+        return StreamSupport.stream(SkipUntilSpliterator.overInclusive(source.spliterator(), condition.negate()), false)
+                .onClose(source::close);
     }
 
     /**
@@ -172,7 +205,8 @@ public final class StreamUtils {
      * @return An element-skipping stream.
      */
     public static <T> Stream<T> skipUntil(Stream<T> source, Predicate<T> condition) {
-        return StreamSupport.stream(SkipUntilSpliterator.over(source.spliterator(), condition), false);
+        return StreamSupport.stream(SkipUntilSpliterator.over(source.spliterator(), condition), false)
+                .onClose(source::close);
     }
 
     /**
@@ -184,7 +218,8 @@ public final class StreamUtils {
      * @return An element-skipping stream.
      */
     public static <T> Stream<T> skipUntilInclusive(Stream<T> source, Predicate<T> condition) {
-        return StreamSupport.stream(SkipUntilSpliterator.overInclusive(source.spliterator(), condition), false);
+        return StreamSupport.stream(SkipUntilSpliterator.overInclusive(source.spliterator(), condition), false)
+                .onClose(source::close);
     }
 
     /**
@@ -256,7 +291,8 @@ public final class StreamUtils {
      * @return A stream of lists representing the windows
      */
     public static <T> Stream<List<T>> windowed(Stream<T> source, int windowSize, int skip, boolean allowLesserSize){
-        return StreamSupport.stream(WindowedSpliterator.over(source.spliterator(), windowSize, skip, allowLesserSize), false);
+        return StreamSupport.stream(WindowedSpliterator.over(source.spliterator(), windowSize, skip, allowLesserSize), false)
+                .onClose(source::close);
     }
 
     /**
@@ -283,7 +319,8 @@ public final class StreamUtils {
      * @return A stream of lists of grouped runs
      */
     public static <T> Stream<List<T>> groupRuns(Stream<T> source, Comparator<T> comparator){
-        return StreamSupport.stream(new GroupRunsSpliterator<T>(source.spliterator(), comparator), false);
+        return StreamSupport.stream(new GroupRunsSpliterator<T>(source.spliterator(), comparator), false)
+                .onClose(source::close);
     }
 
     /**
@@ -302,7 +339,8 @@ public final class StreamUtils {
      */
     public static <T> Stream<T> interleave(Function<T[], Integer> selector, Stream<T>... streams) {
         Spliterator<T>[] spliterators = (Spliterator<T>[]) Stream.of(streams).map(s -> s.spliterator()).toArray(Spliterator[]::new);
-        return StreamSupport.stream(InterleavingSpliterator.interleaving(spliterators, selector), false);
+        return StreamSupport.stream(InterleavingSpliterator.interleaving(spliterators, selector), false)
+                .onClose(closerFor(streams));
     }
 
     /**
@@ -321,7 +359,8 @@ public final class StreamUtils {
      */
     public static <T> Stream<T> interleave(Function<T[], Integer> selector, List<Stream<T>> streams) {
         Spliterator<T>[] spliterators = (Spliterator<T>[]) streams.stream().map(s -> s.spliterator()).toArray(Spliterator[]::new);
-        return StreamSupport.stream(InterleavingSpliterator.interleaving(spliterators, selector), false);
+        return StreamSupport.stream(InterleavingSpliterator.interleaving(spliterators, selector), false)
+                .onClose(closerFor(streams));
     }
 
     /**
@@ -339,7 +378,8 @@ public final class StreamUtils {
      */
     public static <T, O> Stream<O> merge(Supplier<O> unitSupplier, BiFunction<O, T, O> merger, Stream<T>...streams) {
         Spliterator<T>[] spliterators = (Spliterator<T>[]) Stream.of(streams).map(s -> s.spliterator()).toArray(Spliterator[]::new);
-        return StreamSupport.stream(MergingSpliterator.merging(spliterators, unitSupplier, merger), false);
+        return StreamSupport.stream(MergingSpliterator.merging(spliterators, unitSupplier, merger), false)
+                .onClose(closerFor(streams));
     }
 
     /**
@@ -380,7 +420,8 @@ public final class StreamUtils {
      */
     public static <T> Stream<List<T>> aggregate(Stream<T> source, BiPredicate<T, T> predicate) {
         return StreamSupport.stream(new AggregatingSpliterator<T>(source.spliterator(),
-                (a, e) -> a.isEmpty() || predicate.test(a.get(a.size() - 1), e)), false);
+                (a, e) -> a.isEmpty() || predicate.test(a.get(a.size() - 1), e)), false)
+                .onClose(source::close);
     }
 
     /**
@@ -392,7 +433,8 @@ public final class StreamUtils {
      */
     public static <T> Stream<List<T>> aggregate(Stream<T> source, int size) {
         if (size <= 0) throw new IllegalArgumentException("Positive size expected, was: "+size);
-        return StreamSupport.stream(new AggregatingSpliterator<T>(source.spliterator(), (a, e) -> a.size() < size), false);
+        return StreamSupport.stream(new AggregatingSpliterator<T>(source.spliterator(), (a, e) -> a.size() < size), false)
+                .onClose(source::close);
     }
 
     /**
@@ -404,7 +446,8 @@ public final class StreamUtils {
      * @return Stream of List&lt;T&gt; aggregated according to predicate
      */
     public static <T> Stream<List<T>> aggregateOnListCondition(Stream<T> source, BiPredicate<List<T>, T> predicate) {
-        return StreamSupport.stream(new AggregatingSpliterator<T>(source.spliterator(), predicate), false);
+        return StreamSupport.stream(new AggregatingSpliterator<T>(source.spliterator(), predicate), false)
+                .onClose(source::close);
     }
 
     /**
