@@ -15,28 +15,26 @@ public final class StreamUtils {
 
     }
 
-    protected static Runnable closerFor(Stream... streams) {
-        return closerFor(Arrays.asList(streams));
+    private static Runnable closerFor(Stream...streams) {
+      return closerFor(Arrays.asList(streams));
     }
-
 
     private static <T> Runnable closerFor(List<Stream<T>> streams) {
         return () -> {
-            List<Exception> exceptions = new ArrayList<>();
-            for (Stream stream : streams) {
+            List<Exception> exceptions = new LinkedList<>();
+            for (Stream<T> stream : streams) {
                 try {
                     stream.close();
                 } catch (Exception e) {
                     exceptions.add(e);
                 }
             }
-            if (!exceptions.isEmpty()) {
-                Exception exception = exceptions.remove(0);
-                for (Exception suppressed : exceptions) {
-                    exception.addSuppressed(suppressed);
-                }
-                throw new RuntimeException(exception);
-            }
+            exceptions.stream().reduce((e1, e2) -> {
+                  e1.addSuppressed(e2);
+                  return e1;
+                }).ifPresent(combined -> {
+              throw new RuntimeException(combined);
+              });
         };
     }
 

@@ -17,7 +17,7 @@ class WindowedSpliterator<T> implements Spliterator<List<T>> {
     List<T> next = new LinkedList<>();
     private boolean windowSeeded;
 
-    public WindowedSpliterator(Spliterator<T> input, int windowSize, int overlap, boolean allowLesserSize) {
+  WindowedSpliterator(Spliterator<T> input, int windowSize, int overlap, boolean allowLesserSize) {
         source = input;
 
         this.windowSize = windowSize;
