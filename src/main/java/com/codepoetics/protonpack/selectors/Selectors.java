@@ -1,6 +1,7 @@
 package com.codepoetics.protonpack.selectors;
 
 import java.util.Comparator;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 public final class Selectors {
@@ -34,7 +35,7 @@ public final class Selectors {
 
             @Override
             public Integer apply(T[] options) {
-                T smallest = Stream.of(options).filter(t -> t != null).min(comparator).get();
+                T smallest = Stream.of(options).filter(Objects::nonNull).min(comparator).get();
 
                 int result = startIndex;
                 while (options[result] == null || comparator.compare(smallest, options[result]) != 0) {

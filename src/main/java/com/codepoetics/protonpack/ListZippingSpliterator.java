@@ -1,11 +1,11 @@
 package com.codepoetics.protonpack;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Spliterator;
 import java.util.function.Consumer;
 import java.util.function.Function;
+
 import static java.util.function.Predicate.isEqual;
 
 class ListZippingSpliterator<T, O> implements Spliterator<O> {

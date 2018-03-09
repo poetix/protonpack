@@ -3,6 +3,7 @@ package com.codepoetics.protonpack;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -19,9 +20,9 @@ public class AggregateTest {
         Stream<String> stream = Stream.of("a1", "b1", "b2", "c1");
         Stream<List<String>> aggregated = StreamUtils.aggregate(stream, (e1, e2) -> e1.charAt(0) == e2.charAt(0));
         assertThat(aggregated.collect(toList()), contains(
-                asList("a1"),
+            Collections.singletonList("a1"),
                 asList("b1", "b2"),
-                asList("c1")));
+            Collections.singletonList("c1")));
     }
     
     @Test public void
@@ -29,7 +30,7 @@ public class AggregateTest {
         Stream<String> stream = Stream.of("a1", "b1", "b2", "c1");
         Stream<List<String>> aggregated = StreamUtils.aggregate(stream, 1);
         assertThat(aggregated.collect(toList()), contains(
-                asList("a1"), asList("b1"), asList("b2"), asList("c1")));
+            Collections.singletonList("a1"), Collections.singletonList("b1"), Collections.singletonList("b2"), Collections.singletonList("c1")));
     }
     
     @Test public void
@@ -45,20 +46,20 @@ public class AggregateTest {
         Stream<String> stream = Stream.of("a1", "b1", "b2", "c1");
         Stream<List<String>> aggregated = StreamUtils.aggregate(stream, 3);
         assertThat(aggregated.collect(toList()), contains(
-                asList("a1", "b1", "b2"), asList("c1")));
+                asList("a1", "b1", "b2"), Collections.singletonList("c1")));
     }
 
     @Test public void
     find_first_on_size2() {
         Stream<String> stream = Stream.of("a1");
         Stream<List<String>> aggregated = StreamUtils.aggregate(stream, 2);
-        assertThat(aggregated.findFirst().get(), equalTo(asList("a1")));
+        assertThat(aggregated.findFirst().get(), equalTo(Collections.singletonList("a1")));
     }
 
     @Test public void
     works_with_iterator() throws Exception {
         Stream<String> stream = Stream.of("a", "a", "a", "b", "b", "c", "c", "c");
-        Stream<List<String>> aggregated = StreamUtils.aggregate(stream, (a, b) -> a.equals(b));
+        Stream<List<String>> aggregated = StreamUtils.aggregate(stream, String::equals);
         List<List<String>> list = new ArrayList<>();
         aggregated.iterator().forEachRemaining(list::add);
         assertThat(list, contains(

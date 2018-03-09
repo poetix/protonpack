@@ -7,7 +7,7 @@ final class PairSeq<T> implements Seq<T> {
     private final T head;
     private final Seq<T> tail;
 
-    public PairSeq(T head, Seq<T> tail) {
+    PairSeq(T head, Seq<T> tail) {
         this.head = head;
         this.tail = tail;
     }

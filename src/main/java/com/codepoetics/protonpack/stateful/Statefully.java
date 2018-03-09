@@ -1,13 +1,13 @@
 package com.codepoetics.protonpack.stateful;
 
 import com.codepoetics.protonpack.Indexed;
-import com.codepoetics.protonpack.StreamUtils;
 
-import java.util.HashSet;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.*;
+import java.util.function.BiFunction;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -19,99 +19,46 @@ public final class Statefully {
     return (Consumer<O>) NO_OP;
   }
 
-  public static <S, I, O> S traverse(Stream<I> input, S initialState, TraversalStateMachine<S, I, O> stateMachine, Predicate<S> isTerminal) {
-    StatefulSpliterator<S, I, O> spliterator = StatefulSpliterator.over(input, initialState, stateMachine, isTerminal, noOp());
+  public static <S, I, O> S traverse(Stream<I> input, StateMachine<S, I, O> stateMachine) {
+    StatefulSpliterator<S, I, O> spliterator = StatefulSpliterator.over(input, stateMachine);
     StreamSupport.stream(spliterator, false).onClose(input::close).forEach(noOp());
     return spliterator.getState();
   }
 
-  public static <S, I, O> Stream<O> transform(Stream<I> input, S initialState, TraversalStateMachine<S, I, O> stateMachine, Predicate<S> isTerminal) {
-    StatefulSpliterator<S, I, O> spliterator = StatefulSpliterator.over(input, initialState, stateMachine, isTerminal, noOp());
+  public static <S, I, O> Stream<O> transform(Stream<I> input, StateMachine<S, I, O> stateMachine) {
+    StatefulSpliterator<S, I, O> spliterator = StatefulSpliterator.over(input, stateMachine);
     return StreamSupport.stream(spliterator, false).flatMap(s -> s).onClose(input::close);
   }
 
-  public static <S, I, O> Stream<O> transform(Stream<I> input, S initialState, TraversalStateMachine<S, I, O> stateMachine, Predicate<S> isTerminal, Consumer<S> stateObserver) {
-    StatefulSpliterator<S, I, O> spliterator = StatefulSpliterator.over(input, initialState, stateMachine, isTerminal, stateObserver);
-    return StreamSupport.stream(spliterator, false).flatMap(s -> s).onClose(input::close);
+  public static <S, I, O> boolean terminates(Stream<I> input, StateMachine<S, I, O> stateMachine) {
+    return stateMachine.isTerminal(traverse(input, stateMachine));
   }
 
-  public static <S, I, O> boolean terminates(Stream<I> input, S initialState, TraversalStateMachine<S, I, O> stateMachine, Predicate<S> isTerminal) {
-    return isTerminal.test(traverse(input, initialState, stateMachine, isTerminal));
-  }
-
-  public static <T, R> Stream<R> window(Stream<T> input, int size, Function<Stream<T>, R> windowFunction) {
-    return Statefully.transform(
-        input,
-        Window.<T>initialise(size),
-        (window, item) -> {
-          Window<T> newWindow = window.add(item);
-          return Transition.to(newWindow, newWindow.reduce(windowFunction));
-        },
-        s -> false);
+  public static <T, R> Stream<R> window(Stream<T> input, int size, Function<Stream<T>, R> reducer) {
+    return Statefully.transform(input, StateMachines.windowingStateMachine(size, reducer));
   }
 
   public static <T> Stream<Indexed<T>> index(Stream<T> input) {
     return Statefully.transform(
         input,
-        0L,
-        (index, item) -> Transition.to(index + 1, Indexed.index(index, item)),
-        i -> false
+        StateMachine.create(() -> 0L, (index, item) -> Transition.to(index + 1, Indexed.index(index, item)))
     );
   }
 
-  public static final class TaggedValue<S, T> {
-
-    public static <S, T> TaggedValue<S, T> of(S tag, T value) {
-      return new TaggedValue<>(tag, value);
-    }
-
-    private final S tag;
-    private final T value;
-
-    private TaggedValue(S tag, T value) {
-      this.tag = tag;
-      this.value = value;
-    }
-
-    public S getTag() {
-      return tag;
-    }
-
-    public T getValue() {
-      return value;
-    }
-
+  public static <S, T> Stream<TaggedValue<S, T>> tagging(Stream<T> input, S initialState, BiFunction<S, T, S> stateFunction) {
+    return tagging(input, initialState, stateFunction, s -> false);
   }
 
-  public static <S, T> Stream<TaggedValue<S, T>> tagging(Stream<T> input, S initialState, BiFunction<S, T, S> stateMachine, Predicate<S> isTerminal) {
-    return Statefully.transform(
-        input,
-        initialState,
-        (state, item) -> {
-          S newState = stateMachine.apply(state, item);
-          return Transition.to(newState, TaggedValue.of(newState, item));
-        },
-        isTerminal
-    );
+  public static <S, T> Stream<TaggedValue<S, T>> tagging(Stream<T> input, S initialState, BiFunction<S, T, S> stateFunction, Predicate<S> isTerminal) {
+    return Statefully.transform(input, StateMachines.tagging(initialState, stateFunction, isTerminal));
   }
 
   public static <T> Optional<T> findLastMatching(Stream<T> input, Predicate<T> condition) {
-    return Statefully.transform(
-        input,
-        (Supplier<Stream<T>>) Stream::empty,
-        (state, item) -> condition.test(item)
-            ? Transition.to(() -> Stream.of(item))
-            : Transition.to(null, state.get()),
-        Objects::isNull).findFirst();
+    return Statefully.transform(input, StateMachines.lastMatchingFinder(condition)).findFirst();
   }
 
   public static <T> boolean terminatingForEach(Stream<T> input, Function<T, Boolean> action) {
-    return Statefully.traverse(
-        input,
-        true,
-        (shouldContinue, item) -> Transition.to(shouldContinue && action.apply(item)),
-        shouldContinue -> shouldContinue
-    );
+    return Statefully.traverse(input, StateMachines.terminatingForEach(action));
   }
 
   @SafeVarargs
@@ -120,13 +67,7 @@ public final class Statefully {
   }
 
   public static <T> boolean includesItems(Stream<T> input, Set<T> subset) {
-    return Statefully.traverse(
-        input,
-        new HashSet<>(subset),
-        (state, element) -> {
-          state.remove(element);
-          return Transition.to(state, element);
-        },
-        Set::isEmpty).isEmpty();
+    return Statefully.terminates(input, StateMachines.checkingSubset(subset));
   }
+
 }

@@ -37,6 +37,7 @@ public interface Streamable<T> extends Supplier<Stream<T>> {
      * @param <T> The type of the values in the array.
      * @return The streamable.
      */
+    @SafeVarargs
     static <T> Streamable<T> of(T...items) {
         return () -> Stream.of(items);
     }

@@ -3,14 +3,13 @@ package com.codepoetics.protonpack;
 import org.junit.Test;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.hamcrest.Matchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.*;
 
 public class ZipTest {
 
@@ -99,7 +98,7 @@ public class ZipTest {
 
     @Test public void
     zips_an_empty_list_of_streams_without_calling_combiner() {
-        List<String> zipped = StreamUtils.zip(Arrays.asList(),
+        List<String> zipped = StreamUtils.zip(Collections.emptyList(),
                 l -> {if (true) throw new AssertionError(); else return ".";})
                 .collect(Collectors.toList());
 

@@ -317,7 +317,7 @@ public final class StreamUtils {
      * @return A stream of lists of grouped runs
      */
     public static <T> Stream<List<T>> groupRuns(Stream<T> source, Comparator<T> comparator){
-        return StreamSupport.stream(new GroupRunsSpliterator<T>(source.spliterator(), comparator), false)
+        return StreamSupport.stream(new GroupRunsSpliterator<>(source.spliterator(), comparator), false)
                 .onClose(source::close);
     }
 
@@ -335,8 +335,9 @@ public final class StreamUtils {
      * @param <T> The type over which the interleaved streams stream.
      * @return An interleaved stream.
      */
+    @SafeVarargs
     public static <T> Stream<T> interleave(Function<T[], Integer> selector, Stream<T>... streams) {
-        Spliterator<T>[] spliterators = (Spliterator<T>[]) Stream.of(streams).map(s -> s.spliterator()).toArray(Spliterator[]::new);
+        Spliterator<T>[] spliterators = (Spliterator<T>[]) Stream.of(streams).map(BaseStream::spliterator).toArray(Spliterator[]::new);
         return StreamSupport.stream(InterleavingSpliterator.interleaving(spliterators, selector), false)
                 .onClose(closerFor(streams));
     }
@@ -356,7 +357,7 @@ public final class StreamUtils {
      * @return An interleaved stream.
      */
     public static <T> Stream<T> interleave(Function<T[], Integer> selector, List<Stream<T>> streams) {
-        Spliterator<T>[] spliterators = (Spliterator<T>[]) streams.stream().map(s -> s.spliterator()).toArray(Spliterator[]::new);
+        Spliterator<T>[] spliterators = (Spliterator<T>[]) streams.stream().map(BaseStream::spliterator).toArray(Spliterator[]::new);
         return StreamSupport.stream(InterleavingSpliterator.interleaving(spliterators, selector), false)
                 .onClose(closerFor(streams));
     }
@@ -374,8 +375,9 @@ public final class StreamUtils {
      * @param <O> The type of the accumulator, over which the constructed stream streams.
      * @return A merging stream.
      */
+    @SafeVarargs
     public static <T, O> Stream<O> merge(Supplier<O> unitSupplier, BiFunction<O, T, O> merger, Stream<T>...streams) {
-        Spliterator<T>[] spliterators = (Spliterator<T>[]) Stream.of(streams).map(s -> s.spliterator()).toArray(Spliterator[]::new);
+        Spliterator<T>[] spliterators = (Spliterator<T>[]) Stream.of(streams).map(BaseStream::spliterator).toArray(Spliterator[]::new);
         return StreamSupport.stream(MergingSpliterator.merging(spliterators, unitSupplier, merger), false)
                 .onClose(closerFor(streams));
     }
@@ -389,6 +391,7 @@ public final class StreamUtils {
      * @param <T> The type over which the merged streams stream.
      * @return A merging stream of lists of T.
      */
+    @SafeVarargs
     public static <T> Stream<List<T>> mergeToList(Stream<T>...streams) {
         return merge(ArrayList::new, (l, x) -> {
             l.add(x);
@@ -417,8 +420,8 @@ public final class StreamUtils {
      * @return Stream of List&lt;T&gt; aggregated according to predicate
      */
     public static <T> Stream<List<T>> aggregate(Stream<T> source, BiPredicate<T, T> predicate) {
-        return StreamSupport.stream(new AggregatingSpliterator<T>(source.spliterator(),
-                (a, e) -> a.isEmpty() || predicate.test(a.get(a.size() - 1), e)), false)
+        return StreamSupport.stream(new AggregatingSpliterator<>(source.spliterator(),
+            (a, e) -> a.isEmpty() || predicate.test(a.get(a.size() - 1), e)), false)
                 .onClose(source::close);
     }
 
@@ -431,7 +434,7 @@ public final class StreamUtils {
      */
     public static <T> Stream<List<T>> aggregate(Stream<T> source, int size) {
         if (size <= 0) throw new IllegalArgumentException("Positive size expected, was: "+size);
-        return StreamSupport.stream(new AggregatingSpliterator<T>(source.spliterator(), (a, e) -> a.size() < size), false)
+        return StreamSupport.stream(new AggregatingSpliterator<>(source.spliterator(), (a, e) -> a.size() < size), false)
                 .onClose(source::close);
     }
 
@@ -444,7 +447,7 @@ public final class StreamUtils {
      * @return Stream of List&lt;T&gt; aggregated according to predicate
      */
     public static <T> Stream<List<T>> aggregateOnListCondition(Stream<T> source, BiPredicate<List<T>, T> predicate) {
-        return StreamSupport.stream(new AggregatingSpliterator<T>(source.spliterator(), predicate), false)
+        return StreamSupport.stream(new AggregatingSpliterator<>(source.spliterator(), predicate), false)
                 .onClose(source::close);
     }
 
@@ -535,6 +538,16 @@ public final class StreamUtils {
      */
     public static <T> Stream<T> ofNullable(T[] nullable) {
         return null == nullable ? Stream.empty() : Stream.of(nullable);
+    }
+
+  /**
+   * Cycles through a set of items indefinitely.
+   * @param items The items to cycle through.
+   * @param <T> The type of the items.
+   * @return An infinite stream cycling through the supplied items.
+   */
+  public static <T> Stream<T> cycle(T...items) {
+      return IntStream.iterate(0, i -> i == items.length - 1 ? 0 : i + 1).mapToObj(i -> items[i]);
     }
 
 }

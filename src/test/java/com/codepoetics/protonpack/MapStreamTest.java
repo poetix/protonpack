@@ -5,21 +5,18 @@
 
 package com.codepoetics.protonpack;
 
-import static java.util.stream.Collectors.toList;
-
-import static org.hamcrest.Matchers.contains;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertThat;
+import com.codepoetics.protonpack.maps.MapStream;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import com.codepoetics.protonpack.maps.MapStream;
-import org.junit.Before;
-import org.junit.Test;
+import static java.util.stream.Collectors.toList;
+import static org.hamcrest.Matchers.contains;
+import static org.junit.Assert.*;
 
 public class MapStreamTest {
     

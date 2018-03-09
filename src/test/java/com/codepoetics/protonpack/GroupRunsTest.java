@@ -3,6 +3,7 @@ package com.codepoetics.protonpack;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -23,9 +24,9 @@ public class GroupRunsTest {
         assertThat(runs, contains(
                 asList(1, 1),
                 asList(2, 2),
-                asList(3),
-                asList(4),
-                asList(5)));
+            Collections.singletonList(3),
+            Collections.singletonList(4),
+            Collections.singletonList(5)));
     }
 
     @Test
@@ -38,8 +39,8 @@ public class GroupRunsTest {
         assertThat(runs, contains(
                 asList(1, 1),
                 asList(2, 2),
-                asList(3),
-                asList(4),
+            Collections.singletonList(3),
+            Collections.singletonList(4),
                 asList(5, 5)));
     }
 

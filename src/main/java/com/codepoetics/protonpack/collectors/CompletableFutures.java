@@ -1,6 +1,7 @@
 package com.codepoetics.protonpack.collectors;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicLong;
@@ -10,7 +11,6 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
-import java.util.Optional;
 
 import static java.util.stream.Collectors.toList;
 
@@ -107,7 +107,7 @@ public final class CompletableFutures {
 
         @Override
         public synchronized CompletableFuture<A> complete() {
-            output = new CompletableFuture<A>();
+            output = new CompletableFuture<>();
             completeIfReady();
             return output;
         }

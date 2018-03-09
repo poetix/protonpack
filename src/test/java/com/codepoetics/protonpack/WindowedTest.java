@@ -3,6 +3,8 @@ package com.codepoetics.protonpack;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -45,7 +47,7 @@ public class WindowedTest {
     windowing_on__empty_list() {
         ArrayList<Integer> ints = new ArrayList<>();
 
-        ints.stream().collect(maxBy((a, b) -> a.toString().compareTo(b.toString())));
+        ints.stream().collect(maxBy(Comparator.comparing(Object::toString)));
 
         List<List<Integer>> windows = StreamUtils.windowed(ints.stream(), 2).collect(toList());
 
@@ -62,7 +64,7 @@ public class WindowedTest {
         assertThat(windows, contains(
                 asList(1, 2),
                 asList(3, 4),
-                asList(5)));
+            Collections.singletonList(5)));
     }
 
     @Test
@@ -77,7 +79,7 @@ public class WindowedTest {
                 asList(2, 3, 4),
                 asList(3, 4, 5),
                 asList(4, 5),
-                asList(5)));
+            Collections.singletonList(5)));
     }
 
 }

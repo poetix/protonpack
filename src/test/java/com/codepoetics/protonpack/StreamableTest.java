@@ -3,6 +3,7 @@ package com.codepoetics.protonpack;
 import org.junit.Test;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -39,8 +40,8 @@ public class StreamableTest {
     streamable_of_optional() {
         Streamable<Integer> streamableWithItem = Streamable.of(Optional.of(123));
         Streamable<Integer> streamableEmpty = Streamable.of(Optional.empty());
-        assertEquals(Arrays.asList(123), streamableWithItem.toList());
-        assertEquals(Arrays.asList(), streamableEmpty.toList());
+        assertEquals(Collections.singletonList(123), streamableWithItem.toList());
+        assertEquals(Collections.emptyList(), streamableEmpty.toList());
     }
 
     @Test public void

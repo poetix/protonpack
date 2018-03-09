@@ -2,11 +2,17 @@ package com.codepoetics.protonpack;
 
 import org.junit.Test;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.function.Function;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import static com.codepoetics.protonpack.StreamUtils.cycle;
+import static com.codepoetics.protonpack.StreamUtils.zip;
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.IntStream.range;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 
@@ -26,6 +32,6 @@ public class MergeTest {
                 asList("B", "banana", "split"),
                 asList("C", "carrot", "cake"),
                 asList("date", "roll"),
-                asList("pastry")));
+            Collections.singletonList("pastry")));
     }
 }

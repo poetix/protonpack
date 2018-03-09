@@ -35,6 +35,7 @@ public interface Seq<T> extends Streamable<T> {
      * @param <T> The type of the items.
      * @return The created sequence.
      */
+    @SafeVarargs
     static <T> Seq<T> of(T...items) {
         return of(Stream.of(items)).reverse();
     }
