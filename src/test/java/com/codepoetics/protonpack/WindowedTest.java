@@ -55,6 +55,24 @@ public class WindowedTest {
     }
 
     @Test
+    public void windowing_on_list_shorter_than_window_not_allowing_lesser_size() {
+        Stream<Integer> stream = Stream.of(1);
+
+        List<List<Integer>> windows = StreamUtils.windowed(stream, 2).collect(toList());
+
+        assertThat(windows, iterableWithSize(0));
+    }
+
+    @Test
+    public void windowing_on_list_shorter_than_window_allowing_lesser_size() {
+        Stream<Integer> stream = Stream.of(1);
+
+        List<List<Integer>> windows = StreamUtils.windowed(stream, 2, 1, true).collect(toList());
+
+        assertThat(windows, iterableWithSize(1));
+    }
+
+    @Test
     public void
     windowing_on_list_two_overlap_allow_lesser_size() {
         Stream<Integer> integerStream = Stream.of(1, 2, 3, 4, 5);
@@ -81,5 +99,4 @@ public class WindowedTest {
                 asList(4, 5),
             Collections.singletonList(5)));
     }
-
 }

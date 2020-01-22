@@ -61,6 +61,10 @@ class WindowedSpliterator<T> implements Spliterator<List<T>> {
                 return;
             }
         }
+
+        if (next.size() != windowSize && !allowLesserSize) {
+            next.clear();
+        }
     }
 
     private List<T> next() {
