@@ -245,37 +245,45 @@ public interface MapStream<K, V> extends Stream<Entry<K, V>> {
     default MapStream<V, K> inverseMapping() {
         return new DefaultMapStream<>(map(e -> new SimpleImmutableEntry<>(e.getValue(), e.getKey())));
     }
-    
+
+    default MapStream<K, V> filterKeys(Predicate<K> predicate) {
+        return filter(e -> predicate.test(e.getKey()));
+    }
+
+    default MapStream<K, V> filterValues(Predicate<V> predicate) {
+        return filter(e -> predicate.test(e.getValue()));
+    }
+
     @Override
     MapStream<K, V> limit(long n);
-    
+
     @Override
     MapStream<K, V> skip(long n);
-    
+
     @Override
     MapStream<K, V> sorted();
-    
+
     @Override
     MapStream<K, V> sorted(Comparator<? super Entry<K, V>> comparator);
-    
+
     @Override
     MapStream<K, V> peek(Consumer<? super Entry<K, V>> action);
-    
+
     @Override
     MapStream<K, V> onClose(Runnable closeHandler);
-    
+
     @Override
     MapStream<K, V> filter(Predicate<? super Entry<K, V>> predicate);
-    
+
     @Override
     MapStream<K, V> parallel();
-    
+
     @Override
     MapStream<K, V> sequential();
-    
+
     @Override
     MapStream<K, V> unordered();
-    
+
     @Override
     MapStream<K, V> distinct();
 }
