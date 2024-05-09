@@ -56,6 +56,18 @@ public class ZipTest {
     }
 
     @Test public void
+    zips_a_stream_with_index_and_map() {
+        Stream<String> source = Stream.of("Foo", "Bar", "Baz");
+
+        List<Indexed<String>> zipped = StreamUtils.zipWithIndex(source).map(Indexed.mapping(String::toLowerCase)).collect(Collectors.toList());
+
+        assertThat(zipped, contains(
+                Indexed.index(0, "foo"),
+                Indexed.index(1, "bar"),
+                Indexed.index(2, "baz")));
+    }
+
+    @Test public void
     zips_a_trio_of_streams_of_same_length() {
         Stream<String> streamA = Stream.of("A", "B", "C");
         Stream<String> streamB = Stream.of("aggravating", "banausic", "complaisant");
