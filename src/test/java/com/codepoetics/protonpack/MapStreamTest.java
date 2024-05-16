@@ -13,12 +13,14 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertNull;
 
 public class MapStreamTest {
     
@@ -100,5 +102,23 @@ public class MapStreamTest {
         Map<String, Integer> mapReversed = MapStream.of(map).inverseMapping().collect(Integer::sum);
         assertEquals(Integer.valueOf(4), mapReversed.get("John"));
         assertEquals(Integer.valueOf(2), mapReversed.get("Alice"));
+    }
+
+    @Test
+    public void testFilterKeys() {
+        Predicate<String> predicate = s -> s.length() < 5;
+        Map<String, Integer> map = mapStream.filterKeys(predicate).collect();
+
+        assertNull(map.get("Alice"));
+        assertEquals(Integer.valueOf(1),map.get("John"));
+    }
+
+    @Test
+    public void testFilterValues() {
+        Predicate<Integer> predicate = i -> i == 1;
+        Map<String, Integer> map = mapStream.filterValues(predicate).collect();
+
+        assertNull(map.get("Alice"));
+        assertEquals(Integer.valueOf(1),map.get("John"));
     }
 }
