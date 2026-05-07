@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.*;
@@ -207,7 +208,7 @@ public interface MapStream<K, V> extends Stream<Entry<K, V>> {
      * @return a new MapStream
      */
     default MapStream<K, List<V>> mergeKeys() {
-        return of(collect(groupingBy(Entry::getKey, mapping(Entry::getValue, toList()))));
+        return of(collect(groupingBy(Entry::getKey, mapping(Entry::getValue, Collectors.toList()))));
     }
     
     /**
